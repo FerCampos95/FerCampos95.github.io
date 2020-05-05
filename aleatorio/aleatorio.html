@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nros Aleatorios</title>
+    <link rel="stylesheet" href="aleatorio.css">
+</head>
+<body>
+    <script src="aleatorio.js"></script>
+
+    <h1>Generador de Números Aleatorios</h1>
+    
+    <section id="cuerpo">
+        <section id="cuerpoInterno">
+
+            <p>Ingrese la cantidad de cifras que desee como Máximo</p>
+            <p>Si no ingresa nada se obtendran números de 2 cifras</p>
+            <input type="number" name="num" id="cant">
+            <button id="btn" onclick="crearNumeros()">Crear Números</button>
+            <button id="reset" onclick="resetear()" >Resetear</button>
+            
+            <div>
+        
+                <p>--Números Generados--</p>
+                <!-- <section id="seccion">
+                </section> -->
+                <textarea id="seccion" cols="30" rows="10"></textarea>
+                
+            </div>
+
+        </section>
+
+
+    </section>
+
+
+</body>
+</html>

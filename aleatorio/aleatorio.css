@@ -1,0 +1,28 @@
+h1{
+    display: block;
+    background-color: lightblue;
+    padding: 3%;
+    border-radius: 50%;
+    font-size: 3em;
+    text-align: center;
+    border:0.1em solid black;
+}
+
+#cuerpo{
+    text-align: center;
+}
+
+#cuerpo > #cuerpoInterno{
+    display: inline-block;
+    background-color: lightblue;
+    border: 0.3em solid black;
+    box-shadow: blue;
+    padding: 1em;
+}
+
+#seccion{
+    background-color: lightgray;
+    resize: none;
+    text-align: center;
+}
+

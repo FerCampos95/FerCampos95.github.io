@@ -1,0 +1,16 @@
+body{
+    background: grey;
+}
+
+body p{
+    font-size: 200%;
+}
+
+div{
+    background: honeydew;
+    font-size: 400%;
+    display: inline-block;
+    border: black;
+    border-radius: 15%;
+    margin-left: 40%; 
+}

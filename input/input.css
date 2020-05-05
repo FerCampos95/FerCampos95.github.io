@@ -1,0 +1,35 @@
+body{
+    background-color: lightgrey;
+
+}
+
+h1{
+    background: lightpink;
+    color: white;
+    padding: 3%;
+    font-size: 400%;
+    text-align: center;
+}
+
+div{
+    background-color: lime;
+    padding: 1%;
+    display: inline-block;
+}
+
+p{
+    background-color: maroon;
+    padding: 1%;
+    display: inline-block;
+}
+
+input{
+    background-color: orange;
+    ;
+}
+
+section{
+    display: block;
+    background-color: mediumaquamarine;
+    text-align: center;
+}

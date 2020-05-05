@@ -1,0 +1,18 @@
+body{
+    background-color: grey;
+    color: white;
+}
+
+h1{
+    background-color: #B62222;
+    color: white;
+    padding: 2%;
+    display: block;
+    text-align: center;
+    font-size: xxx-large;
+    font-style: italic;
+}
+
+h2{
+    margin-left: 2%;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorcado</title>
+    <link rel="stylesheet" href="ahorcado.css">
+</head>
+<body>
+    <h1>Bienvenido al juego del Ahorcado</h1>
+    
+    
+    <section id="cuerpo">
+        
+        <section id="interfaz">
+            
+            <div id="juego">
+                Palabra o frase
+            </div>
+
+            <input type="text" id="ingLetra">
+            <button id="btnLetra" onclick="chequearLetra();">Ingresar Letra</button>
+            <button id="btnCargar" onclick="pedirPalabra();" >Cargar palabras</button>
+        </section>
+        
+        <section id="datos">
+            
+            <img id="imagen" src="imagenes/dib0.png" alt="Dibujo Ahorcado" width="30%">
+            <p id="letUsadas">Letras Usadas: -</p>
+            <p id="intentos">Intentos Restantes: 5</p>
+    
+        </section>
+
+    </section>
+    
+    <script src="cargarPalabra.js"></script>
+</body>
+</html>

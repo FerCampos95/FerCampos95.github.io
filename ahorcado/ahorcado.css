@@ -1,0 +1,27 @@
+body{
+    background-color: grey;
+}
+
+h1{
+    display: block;
+    text-align: center;
+    background-color: burlywood;
+    padding: 1%;
+}
+
+div{
+    display: inline-block;
+    text-align:  center;
+    font-size: 300%;
+}
+
+#interfaz{
+    /* display: inline-block; */
+    text-align: center;
+    padding: 2%;
+}
+
+#cuerpo{
+    display: flex;
+    text-align: center;
+}

@@ -1,0 +1,17 @@
+h1{
+    background-color: cadetblue;
+    display: block;
+    text-align: center;
+    padding: 1%;
+}
+
+section{
+    background-color: white;
+    display: block;
+    text-align: center;
+}
+
+/* div{
+    display: inline-block;
+    
+} */

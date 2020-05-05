@@ -1,0 +1,47 @@
+h1{
+    text-align: center;
+    background-color: lightgreen;
+    padding: 1.5%;
+    font-size: 300%;
+}
+
+section{
+    text-align: center;
+}
+
+form{
+    padding: 1%;
+    text-align: center;
+    background-color: lightgrey;
+    display: inline-block;
+    border: 0.2em solid black;
+    
+}
+
+#nota{
+    /* margin-top: 0.3em;
+    padding: 0.2em; */
+    resize: none;
+}
+#submit{
+    margin-top: 1em;
+    text-align: center;
+    padding: 0.2em;
+    /* align-content: center;     */
+}
+
+div{
+    /* margin-top: 1em; */
+    inline-size: 50%;
+    border: black solid 0.2em;
+    display: inline-block;
+    text-align: justify;
+}
+
+.btn-borrar{
+    border-radius: 50%;
+    color: red;
+    background-color:black;
+    font-size: 70%;
+    text-align: left;
+}
