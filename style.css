@@ -16,3 +16,10 @@ h1{
 h2{
     margin-left: 2%;
 }
+
+.nav{
+    display: inline-block;
+    background-color: lightcoral;
+    text-decoration: none;
+    padding: 1%;
+}
