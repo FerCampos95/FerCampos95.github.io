@@ -22,4 +22,10 @@ h2{
     background-color: lightcoral;
     text-decoration: none;
     padding: 1%;
+    border-radius: 5%;
+}
+
+#otraPag:hover{
+    background-color: lightsalmon;
+    border: white solid 0.1em;
 }
