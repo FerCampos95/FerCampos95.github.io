@@ -15,20 +15,28 @@ h1{
 
 h2{
     margin-left: 2%;
+    text-align: center;
+}
+
+#menu{
+    display: flex;
+    align-content: center;
 }
 
 .nav{
-    display: inline-flex;
-    justify-content: center;
+    display: block;
+    text-align: center;
     background-color: lightcoral;
     text-decoration: none;
-    padding: 0.5%;
+    padding: 0.9%;
     border-radius: 5%;
     color: white;
+    margin: 0.5%;
+    border: white solid 0.1em;
     
 }
 
 .nav:hover{
     background-color: lightsalmon;
-    border: white solid 0.1em;
+    box-shadow: 0.1em black ;
 }
