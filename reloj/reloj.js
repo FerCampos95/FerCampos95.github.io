@@ -20,20 +20,21 @@ hora.m=separados[1];
 hora.s=separados[2];
 
 
-console.log(typeof(variable));
-console.log(variable);
-console.log(typeof(linea));
-console.log(linea);
+// console.log(typeof(variable));
+// console.log(variable);
+// console.log(typeof(linea));
+// console.log(linea);
 
 let lineaHora= "Holo";
 iniciar(hora,lineaHora);
 
 function iniciar(hora,lineaHora){
-    document.getElementById('reloj').innerHTML=`${hora.h}:${hora.m}:${hora.s}`;
-    //document.getElementById('reloj').innerHTML=`${lineaHora}`;
+    //document.getElementById('reloj').innerHTML=`${hora.h}:${hora.m}:${hora.s}`;
     incrementarHora(hora);
-    //lineaHora = incrementarLineaHora(hora,lineaHora);
+    lineaHora = incrementarLineaHora(hora,lineaHora);
     
+    document.getElementById('reloj').innerHTML=`${lineaHora}`;
+
     setTimeout("iniciar(hora,lineaHora)",1000);
 }
 
@@ -56,24 +57,41 @@ function incrementarHora(hora){
 }
 
 function incrementarLineaHora(hora, lineaHora){
-    if((hora.h.length) ===1){
-        lineaHora= "0"+hora.h;
+    lineaHora="";
+    
+    if(hora.h.toString().length <2){
+        lineaHora+= "0"+ hora.h;
     }else{
-        lineaHora= hora.h;
+        if(hora.h ==0){ ///ESTO ES XQ SI EL NRO ES 0 NO LO PASA A STRING
+            lineaHora+="00";
+        }else{
+            lineaHora+= + hora.h;
+        }
     }
+
     lineaHora+=":";
 
-    if(hora.m.length <1){
-        lineaHora+= "0"+hora.m;
+    if(hora.m.toString().length <2){
+        lineaHora+= "0"+ hora.m;
     }else{
-        lineaHora+= hora.m;
+        if(hora.m ==0){ ///ESTO ES XQ SI EL NRO ES 0 NO LO PASA A STRING
+            lineaHora+="00";
+        }else{
+            lineaHora+= + hora.m;
+        }
     }
+    
     lineaHora+=":";
 
-    if(hora.s.length <1){
-        lineaHora+= lineaHora+ "0"+ hora.s;
+    if(hora.s.toString().length <2){
+        lineaHora+= "0"+ hora.s;
     }else{
-        lineaHora+= lineaHora + hora.s;
+        if(hora.s ==0){ ///ESTO ES XQ SI EL NRO ES 0 NO LO PASA A STRING
+            lineaHora+="00";
+        }else{
+            lineaHora+= + hora.s;
+        }
     }
 
+    return lineaHora;
 }
