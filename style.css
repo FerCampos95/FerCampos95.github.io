@@ -18,6 +18,11 @@ h2{
     text-align: center;
 }
 
+#inicio{
+    display: block;
+    align-content: center;
+}
+
 #menu{
     display: flex;
     align-content: center;

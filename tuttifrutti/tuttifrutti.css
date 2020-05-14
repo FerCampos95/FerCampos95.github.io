@@ -1,0 +1,19 @@
+#formulario{
+    display: block;
+    text-align: center;
+    width: 30%;
+    padding: 2%;
+    background-color: rgb(170, 170, 223);
+}
+
+.categoria{
+    margin-top: 1em;
+}
+
+#btn-finalizar{
+    margin-top: 2em;
+}
+
+h3{
+    font-size: 160%;
+}

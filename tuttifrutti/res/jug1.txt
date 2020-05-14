@@ -1,3 +1,0 @@
-nombre:
-2da lineaaa,
-3ra linea

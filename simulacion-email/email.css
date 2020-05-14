@@ -1,0 +1,10 @@
+#botones{
+    display: flex;
+    justify-content: space-around;
+}
+.boton{
+    border-radius: 10%;
+    margin: 3%;
+    font-size: 150%;
+    background-color: rgb(72, 208, 253);
+}

@@ -3,20 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuttiFrutti</title>
+    <title>Tuttifrutti</title>
+    <link rel="stylesheet" href="tuttifrutti.css">
 </head>
 <body>
-    <h1>Bienvenido al TuttiFrutti</h1>
+    <div id="formulario">
+        <h3>Complete su Tabla</h3>
+        <h4>Palabras con....</h4>  
+        <p id="letra">Letra</p>  <!--Este es el lugar para colocar la letra-->
+        <label id="labelCat1">categoria1
+            <input type="text" id="cat1" class="categoria">
+            <input type="button" value="enviar">
+        </label>
 
-    <input type="nomUsuario" value="Ingrese Nombre">
-    <button id="btnIniciar" onclick="verTexto()">Iniciar</button>
-    <button id="btnOcultar">Ocultar/Mostrar Texto</button>
-    <div id="texto">Contenido del archivo</div>
-    
+        <br>
+        <label id="labelCat2">categoria2
+        <input type="text" id="cat2" class="categoria">
+        <input type="button" value="enviar">
+        </label>
 
+        <br>
+        <label id="labelCat3">categoria3
+        <input type="text" id="cat3" class="categoria">
+        <input type="button" value="enviar">
+        </label>
 
+        <br>
+        <label id="labelCat4">categoria4
+        <input type="text" id="cat4" class="categoria">
+        <input type="button" value="enviar">
+        </label>
 
+        <br>
+        <label id="labelCat5">categoria5
+        <input type="text" id="cat5" class="categoria">
+        <input type="button" value="enviar">
+        </label>
+        
+        <br>
+        <input type="button" value="FINALIZAR" id="btn-finalizar">
+    </div>
 
-    <script src="tuttifrutti.js"></script>
 </body>
 </html>

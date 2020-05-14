@@ -1,0 +1,9 @@
+#padre{
+    background-color: blue;
+    display: flex;
+}
+
+#superior{
+    background-color: blueviolet;
+    display: flex;
+}
