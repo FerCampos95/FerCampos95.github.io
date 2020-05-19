@@ -24,9 +24,10 @@
                     <label>Para:<input type="email" id="para" value="ejemplo@email.com" onclick="this.select()"></label>
                     <label>Asunto:<input type="text" id="asunto" required> </label>
                     <label>Mensaje:<input type="text" id="mensaje" required></label>
+                    <img id="spinner" src="img/spinner.gif" height="100em" alt="spinner" hidden=true>
                     <div id="botones">
                         <div class="valign-wrapper">
-                            <button type="submit" class="hoverable valign-wrapper boton">Enviar<i class="material-icons prefix">send</i></button>
+                            <button id="enviar" type="submit" class="hoverable valign-wrapper boton">Enviar<i class="material-icons prefix">send</i></button>
                             <button type="reset" class="hoverable valign-wrapper boton">Limpiar <i class="material-icons prefix">delete</i></button>
                         </div>    
                     </div>
@@ -36,5 +37,6 @@
     </div>
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="email.js"></script>
     </body>
     </html>
