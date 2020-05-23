@@ -2,11 +2,8 @@
 let texto="";
 let listaNotas= document.getElementById("listaNotas");
 
-
 //EVENT LISTENERS
 eventListeners();
-
-
 
 function eventListeners(){
     //CUANDO APRETO SUBMIT
@@ -14,7 +11,6 @@ function eventListeners(){
     listaNotas.addEventListener("click",borrarNota);
     document.addEventListener("DOMContentLoaded", cargarNotas);
 }
-
 
 //FUNCIONES
 function agregarNota(e){
@@ -30,7 +26,7 @@ function agregarNota(e){
     li.innerText= texto;
     
     let btnBorrar= document.createElement("button");
-    btnBorrar.classList="btn-borrar" //aca podria añadirle una clase al boton
+    btnBorrar.classList="btn-borrar"; //aca añado una clase al boton
     btnBorrar.innerText="X";
 
     li.appendChild(btnBorrar); ///AGREGO EL BOTON AL LI

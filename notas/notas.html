@@ -9,28 +9,31 @@
 <body>
     <h1>Notas</h1>
     
-    <section>
-        <form action="notas.js" id=formulario> <!--ACTION ES EL QUE CONTROLA LOS DATOS DEL FORM  -->
-            <label>Ingrese su nota<br>
-                <!-- <input type="text" id="nota"> <br> -->
-                <textarea id="nota" cols="30" rows="10" onfocus="this.select()"></textarea>
-                <br>
-            </label>
-            <input type="submit" value="Agregar" id="submit">
-        </form>
-    </section>
+    <div id="padre">
 
-    <section>
-        <h2>.-Sus Notas-.</h2>
-        <div id="notas">
-            <ul id="listaNotas">
-                <!-- ACA TENGO QUE AGREGAR LOS LI Y UN BOTON A CADA LI -->
-                <!-- <li>Hola perris <button>x</button> </li>
-                <li>Otro perris</li> -->
-            </ul>
-        </div>
-    </section>
-
+        <section>
+            <form action="notas.js" id=formulario> <!--ACTION ES EL QUE CONTROLA LOS DATOS DEL FORM  -->
+                <label>Ingrese su nota<br>
+                    <!-- <input type="text" id="nota"> <br> -->
+                    <textarea id="nota" cols="30" rows="10" onfocus="this.select()"></textarea>
+                    <br>
+                </label>
+                <input type="submit" value="Agregar" id="submit">
+            </form>
+        </section>
+        
+        <section>
+            <h2>.-Sus Notas-.</h2>
+            <div id="notas">
+                <ul id="listaNotas">
+                    <!-- ACA TENGO QUE AGREGAR LOS LI Y UN BOTON A CADA LI -->
+                    <!-- <li>Hola perris <button>x</button> </li>
+                        <li>Otro perris</li> -->
+                </ul>
+            </div>
+        </section>
+    </div>
+            
     <script src="notas.js"></script>
 </body>
 </html>

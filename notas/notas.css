@@ -30,18 +30,19 @@ form{
     /* align-content: center;     */
 }
 
-div{
-    /* margin-top: 1em; */
+#notas{
+    
     inline-size: 50%;
     border: black solid 0.2em;
     display: inline-block;
-    text-align: justify;
-}
+    display: flexbox;
+    text-align: left;
+    
+} 
 
 .btn-borrar{
     border-radius: 50%;
     color: red;
     background-color:black;
     font-size: 70%;
-    text-align: left;
 }
