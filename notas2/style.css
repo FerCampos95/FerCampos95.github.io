@@ -145,11 +145,11 @@ a {
 	padding: 20px 0px 0px 0px;
 }
 
-#page-bgtop {
-}
+/* #page-bgtop {
+} */
 
-#page-bgbtm {
-}
+/* #page-bgbtm {
+} */
 
 /* Content */
 #content {
@@ -164,11 +164,11 @@ a {
 	background: #FFFFFF;
 }
 
-.post-bgtop {
+/* .post-bgtop {
 }
 
 .post-bgbtm {
-}
+} */
 
 .post .title {
 	height: 38px;
@@ -192,8 +192,8 @@ a {
 	font-style: italic;
 }
 
-.post .meta a {
-}
+/* .post .meta a {
+} */
 
 .post .entry {
 	background: url(images/img02.jpg) no-repeat left top;
@@ -278,9 +278,8 @@ a {
 	text-decoration: underline;
 }
 
-.padre-lista{
-
-}
+/* .padre-lista{
+} */
 .lista-notas{
 	display: flex;
 	flex-direction: row;
