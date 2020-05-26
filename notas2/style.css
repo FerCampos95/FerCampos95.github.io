@@ -159,7 +159,9 @@ a {
 }
 
 .post {
-	margin-bottom: 25lñpx;
+	margin-bottom: 30px;
+	/* ACOMODE EL DEFASE CON EL MARGIN-TOP NEGATIVO */
+	margin-top: -15px;
 	padding: 0px;
 	background: #FFFFFF;
 }
