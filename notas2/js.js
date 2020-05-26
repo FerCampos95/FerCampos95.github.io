@@ -4,7 +4,7 @@ let btnEditarHoja;
 let btnBorrarHoja;
 let selectHoja= document.getElementById("select"); //seleccionador de hoja para añadir nota
 let checkboxHoja;
-let listaHojas= document.getElementById("hojas"); //ul con los LI de nombres de Hojas
+let listaHojas= document.getElementById("ho"); //ul con los LI de nombres de Hojas
 let nombresHojas= new Array();
 let nombreHoja;
 
@@ -66,6 +66,11 @@ function agregarNotaConEnter(e){
 function agregarNota(e){
     e.preventDefault();
     nombreHoja= selectHoja.value;
+    textoNota= document.getElementById("textarea").value;
+    if(textoNota===null || textoNota.trim()===""){
+        window.alert("No puede ingresar una nota vacia");
+        return false; ///lo corto xq la nota esta vacia
+    }
     
     if(nombreHoja==="null"){ //null hardcodeado en el select(opcion ->seleecione su hoja)
         window.alert("Error debe seleccionar una hoja en donde insertar la nota");
@@ -80,15 +85,16 @@ function agregarNota(e){
         }
     }
     let uldeHoja= document.getElementById("ul"+nombreHoja);
-    textoNota= document.getElementById("textarea").value;
 
-    listaNotas= obtenerLocalStorage(nombreHoja)///esto reemplazaria las 3 lineas de arriba
+    listaNotas= obtenerLocalStorage(nombreHoja);///esto reemplazaria las 3 lineas de arriba
     listaNotas.push(textoNota);
     localStorage.setItem(nombreHoja, JSON.stringify(listaNotas)); //ya guarde en local storage
 
     nuevoLI= crearNota(textoNota);
     uldeHoja.appendChild(nuevoLI);
 
+    document.getElementById("textarea").select();
+    return true;
 }
 //FIN DE EVENT LISTENERS
 
@@ -131,7 +137,7 @@ function crearNuevaHoja(tituloHoja){ //CREA LA HOJA VISUAL Y LOS ACCESOS A LA IZ
     nuevoLI.appendChild(nuevoLabel);
     nuevoLI.appendChild(nuevobtnEditar);
     nuevoLI.appendChild(nuevobtnBorrar);
-    nuevoLI.addEventListener("click",ocultaMuestraHoja);
+    nuevoLI.addEventListener("click",listenersLI);
 
 
     listaHojas.appendChild(nuevoLI);
@@ -176,7 +182,7 @@ function crearNota(textoNota){
 
     nuevobtnEditar= document.createElement("button");
     nuevobtnEditar.innerText="E";
-    nuevobtnEditar.className="lista-boton-editar";
+    nuevobtnEditar.className="lista-btn-editar";
 
     nuevobtnBorrar= document.createElement("button");
     nuevobtnBorrar.innerText="X";
@@ -185,32 +191,113 @@ function crearNota(textoNota){
     nuevoLI.appendChild(nuevoLabel);
     nuevoLI.appendChild(nuevobtnEditar);
     nuevoLI.appendChild(nuevobtnBorrar);
+
+    //le añado el listener de los botones borrar y editar
+    nuevoLI.addEventListener("click",listenersLI);
     return nuevoLI;
+}
+
+function listenersLI(e){
+    e.preventDefault();
+    // console.log(e.target.className);
+    if(e.target.className=== "lista-checkbox")
+        ocultaMuestraHoja(e);
+
+    if(e.target.className==="lista-btn-borrar")
+        eliminarHojaoNota(e);
+
+    if(e.target.className==="lista-btn-editar")
+        editarHojaoNota(e);
+}
+
+function editarHojaoNota(e){
+    let cantElementos= e.path[1].childNodes.length; ///cantidad de elementos que tiene el e
+    let label=e.path[1].childNodes[cantElementos-3].innerText;//nombre del label
+    let labelEditado=window.prompt("Modifique aquí..",label);
+    if(labelEditado===null || labelEditado.trim()==="")
+    {
+        window.alert("Operación Cancelada");
+        return;//CANCELO LA EDICION
+    }
+
+    let tituloHoja=e.target.parentElement.parentElement.id; //ul + nombre de la hoja
+    tituloHoja= tituloHoja.substring(2);//quito el ul del nombre de la hoja si era hoja qda ""
+    
+    let lista;
+    if(tituloHoja==="")//SIGNIFICA QUE ESTOY editando UNA HOJA
+    {
+        tituloHoja="titulosHojas";
+        lista= obtenerLocalStorage("titulosHojas");//obtengo el nombre de todas las hojas
+        //document.getElementById(label).innerText=labelEditado;//modifico el titulo de la hoja visual
+        let contenido= obtenerLocalStorage(label);
+        localStorage.setItem(labelEditado,JSON.stringify(contenido));//creo una nueva hoja y coloco lo que tenia la otra
+        localStorage.removeItem(label);//elimino la hoja con todas sus notas
+    }else{//SIGNIFICA QUE ESTOY editando UNA NOTA
+        lista= obtenerLocalStorage(tituloHoja);//obtengo las notas de la hoja
+    }
+
+    lista.forEach(function(elemento,index){
+        if(elemento===label){
+            console.log("encontro la hoja en titulos");
+            // lista.splice(index,1);//elimina el TITULO o la NOTA que coincide con lo que quiero eliminar
+            // lista.push(labelEditado);//agrego el TITULO o la NOTA editada
+            lista[index]=labelEditado; //reemplaza las lineas de arriba
+            localStorage.setItem(tituloHoja,JSON.stringify(lista));
+            // localStorage.removeItem(label);//elimina la hoja del local storage
+        }
+    });
+
+    location.reload();
+    // localStorage.setItem("titulosHojas",JSON.stringify(lista));
+    // e.target.parentElement.remove();
+}
+
+function eliminarHojaoNota(e){
+    let cantElementos= e.path[1].childNodes.length; ///cantidad de elementos que tiene el e
+    let label=e.path[1].childNodes[cantElementos-3].innerText;//nombre del label
+    
+    let tituloHoja=e.target.parentElement.parentElement.id; //ul + nombre de la hoja
+    tituloHoja= tituloHoja.substring(2);//quito el ul del nombre de la hoja
+    
+    let lista;
+    if(tituloHoja==="")//SIGNIFICA QUE ESTOY BORRANDO UNA HOJA COMPLETA
+    {
+        lista= obtenerLocalStorage("titulosHojas");//obtengo el nombre de todas las hojas
+        document.getElementById(label).remove();//elimina la hoja visual
+        localStorage.removeItem(tituloHoja);//elimino la hoja con todas sus notas
+    }else{//SIGNIFICA QUE ESTOY BORRANDO UNA NOTA
+        lista= obtenerLocalStorage(tituloHoja);//obtengo las notas de la hoja
+    }
+
+    lista.forEach(function(elemento,index){
+        if(elemento===label){
+            lista.splice(index,1);//elimina el TITULO o la NOTA que coincide con lo que quiero eliminar
+            localStorage.removeItem(label);//elimina la hoja del local storage
+        }
+    });
+    localStorage.setItem("titulosHojas",JSON.stringify(lista));
+    e.target.parentElement.remove();
 }
 
 function ocultaMuestraHoja(e){
     // e.preventDefault(); //no lo uso xq inhabilita el on off del checkbox
-    if(e.target.className=== "lista-checkbox"){
-        // console.log(e); //muestra el evento
-        // console.log(e.path[1]); //muestra la ruta del evento
-        //console.log(e.path[1].childNodes[1]);//muestra el segundo elemento(en este caso el label)
-        nombreHoja = e.path[1].childNodes[1].innerText; ///con esto obtengo el nombre del titulo de la hoja
-        checkboxHoja= e.path[1].childNodes[0];
+    
+    // console.log(e); //muestra el evento
+    // console.log(e.path[1]); //muestra la ruta del evento
+    //console.log(e.path[1].childNodes[1]);//muestra el segundo elemento(en este caso el label)
+    nombreHoja = e.path[1].childNodes[1].innerText; ///con esto obtengo el nombre del titulo de la hoja
+    checkboxHoja= e.path[1].childNodes[0];
 
-        let hoja= document.getElementById(nombreHoja);
-        if(checkboxHoja.checked==false){ //significa que lo acaban de apagar
-            hoja.hidden=true;
-        }else{
-            hoja.hidden=false;
-        }
+    let hoja= document.getElementById(nombreHoja);
+    if(checkboxHoja.checked==false){ //significa que lo acaban de apagar
+        hoja.hidden=true;
+    }else{
+        hoja.hidden=false;
     }
-
 }
 
 
-
-
-//////////////////////FUNCIONES PARA CARGAR LOCALSTORAGE A LA PAGINA///////////////////
+/////////////////////////////FUNCIONES PARA CARGAR LOCALSTORAGE A LA PAGINA/////////////////////////
 function obtenerTitulos(){
     nombresHojas= JSON.parse(localStorage.getItem("titulosHojas"));
     
