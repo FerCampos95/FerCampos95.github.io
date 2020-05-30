@@ -281,8 +281,10 @@ a {
 	text-decoration: underline;
 }
 
-/* .padre-lista{
-} */
+.padre-lista-notas{
+	list-style: circle;
+	list-style-position: inside;
+}
 .lista-notas{
 	display: flex;
 	flex-direction: row;
@@ -292,6 +294,8 @@ a {
 	/* margin-top: 10px; */
 	border-bottom: 1px dashed #787878;
 	margin-bottom: 3px;
+	font-size: 14px;
+	font-weight: bold;
 }
 .lista-hojas{
 	display: flex;
@@ -299,6 +303,8 @@ a {
 	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: space-between;
+	font-size: 14px;
+	font-weight: bold;
 }
 .lista-checkbox{
 	flex: 1 1 auto;
@@ -308,11 +314,39 @@ a {
 }
 .lista-btn-borrar{
 	flex: 1 1 auto;
+	background: transparent;
+	background-image: url("images/eliminar.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	height: 26px;
+	width: 26px;
+	background-position: center;
+	border:none;
 }
-.lista-boton-editar{
+.lista-btn-editar{
 	flex: 1 1 auto;
+	background: transparent;
+	background-image: url("images/lapiz.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	height: 24px;
+	width: 24px;
+	background-position: center;
+	border:none;
 }
 
+#btn-agregar-nota{
+	/* background: transparent; */
+	background-image: url("images/agregar.png");
+	background-size: 16px;
+	background-repeat: no-repeat;
+	height: 24px;
+	width: 24px;
+	background-position: 148px;
+	/* border:none; */
+	font-weight: bold;
+	font-size: 16px;
+}
 
 #nueva-hoja {
 	background-color: #FFFFFF;

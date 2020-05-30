@@ -130,10 +130,10 @@ function crearNuevaHoja(tituloHoja){ //CREA LA HOJA VISUAL Y LOS ACCESOS A LA IZ
     nuevoLabel.innerText= tituloHoja;
 
     nuevobtnEditar.className="lista-btn-editar";
-    nuevobtnEditar.innerText="E";
+    // nuevobtnEditar.innerText="E";
     
     nuevobtnBorrar.className="lista-btn-borrar";
-    nuevobtnBorrar.innerText="X";
+    // nuevobtnBorrar.innerText="X";
     
     nuevoLI= document.createElement("li");
     nuevoLI.className="lista-hojas";
@@ -185,11 +185,11 @@ function crearNota(textoNota){
     nuevoLabel.innerText= textoNota; ///texto agarrado del textarea
 
     nuevobtnEditar= document.createElement("button");
-    nuevobtnEditar.innerText="E";
+    // nuevobtnEditar.innerText="E";
     nuevobtnEditar.className="lista-btn-editar";
 
     nuevobtnBorrar= document.createElement("button");
-    nuevobtnBorrar.innerText="X";
+    // nuevobtnBorrar.innerText="X";
     nuevobtnBorrar.className="lista-btn-borrar";
 
     nuevoLI.appendChild(nuevoLabel);
