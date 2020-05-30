@@ -221,7 +221,8 @@ a {
 	float: left;
 	width: 240px;
 	padding: 0px;
-	color: #787878;
+	/* color: #787878; */
+	color: black;
 }
 
 #sidebar ul {
@@ -364,6 +365,10 @@ a {
 	margin: 3px;
 	border-radius: 10%;
 	width: 234px;
+}
+
+label{
+	color: black;
 }
 
 /*FIN DE OPCIONES IZQUIERDA*/
