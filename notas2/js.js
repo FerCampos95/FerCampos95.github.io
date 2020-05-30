@@ -32,9 +32,13 @@ function agregarHoja(e){
     if(nombresHojas===null)
         nombresHojas= new Array();
 
+    let mensaje= "Ingrese el título de la nueva Hoja";
     if(selectHoja.value==="nueva hoja"){
-        tituloHoja= window.prompt("Ingrese el título de la nueva Hoja");
-        
+        do{
+            tituloHoja= window.prompt(mensaje);
+            mensaje='No puede ingresar "nueva hoja" como nombre de la hoja, intente otro nombre';
+        }while(tituloHoja === "nueva hoja");
+
         if(tituloHoja !==null && tituloHoja.trim() !=="")
         {
             ///ACA METO EL CODIGO PARA AGREGAR UNA NUEVA CLAVE ->VALOR
@@ -227,6 +231,10 @@ function editarHojaoNota(e){
     let lista;
     if(tituloHoja==="|Ñ{[")//SIGNIFICA QUE ESTOY editando UNA HOJA
     {
+        if(labelEditado==="nueva hoja"){
+            window.alert("Lo siento, operación cancelada. No se puede colocar 'nueva hoja' como nombre de hoja");
+            return;
+        }
         tituloHoja="titulosHojas";
         lista= obtenerLocalStorage(tituloHoja);//obtengo el nombre de todas las hojas
         //document.getElementById(label).innerText=labelEditado;//modifico el titulo de la hoja visual
@@ -237,14 +245,13 @@ function editarHojaoNota(e){
         lista= obtenerLocalStorage(tituloHoja);//obtengo las notas de la hoja
     }
 
+    let realizado=false;
     lista.forEach(function(elemento,index){
-        if(elemento===label){
-            console.log("encontro la hoja en titulos");
-            // lista.splice(index,1);//elimina el TITULO o la NOTA que coincide con lo que quiero eliminar
-            // lista.push(labelEditado);//agrego el TITULO o la NOTA editada
+        if(elemento===label && !realizado){
             lista[index]=labelEditado; //reemplaza las lineas de arriba
             localStorage.setItem(tituloHoja,JSON.stringify(lista));
             // localStorage.removeItem(label);//elimina la hoja del local storage
+            realizado=true;
         }
     });
 
@@ -261,23 +268,30 @@ function eliminarHojaoNota(e){
     tituloHoja= tituloHoja.substring(2);//quito el ul del nombre de la hoja
     
     let lista;
-    if(tituloHoja==="|Ñ{[")//SIGNIFICA QUE ESTOY BORRANDO UNA HOJA COMPLETA
+    if(tituloHoja==="|Ñ{[")//SIGNIFICA QUE ESTOY BORRANDO UNA HOJA COMPLETA  //lo use xq sino se confundia y me editaba las hojas
     {
-        lista= obtenerLocalStorage("titulosHojas");//obtengo el nombre de todas las hojas
+        if(!window.confirm("Seguro desea eliminar la Hoja: "+label+"?"))
+            return;
+
+        tituloHoja="titulosHojas";
+        lista= obtenerLocalStorage(tituloHoja);//obtengo el nombre de todas las hojas
         document.getElementById(label).remove();//elimina la hoja visual
         localStorage.removeItem(tituloHoja);//elimino la hoja con todas sus notas
     }else{//SIGNIFICA QUE ESTOY BORRANDO UNA NOTA
         lista= obtenerLocalStorage(tituloHoja);//obtengo las notas de la hoja
     }
 
+    let realizado=false;
     lista.forEach(function(elemento,index){
-        if(elemento===label){
+        if(elemento===label && !realizado){
             lista.splice(index,1);//elimina el TITULO o la NOTA que coincide con lo que quiero eliminar
             localStorage.removeItem(label);//elimina la hoja del local storage
+            realizado=true;
         }
     });
     localStorage.setItem(tituloHoja,JSON.stringify(lista));
     e.target.parentElement.remove();
+    location.reload();
 }
 
 function ocultaMuestraHoja(e){
