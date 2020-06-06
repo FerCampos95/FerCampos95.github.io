@@ -1,0 +1,123 @@
+body{
+    text-align: center;
+}
+#padre{
+    padding: 2%;
+    background-color: lightblue;
+    display: inline-block;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    text-align: center;
+    border-radius: 1%;
+
+}
+
+#formulario{
+    display: flexbox;
+    /* flex-direction: row; */
+    text-align: justify;
+    width: 400px;
+    padding: 15px;
+    border-radius: 2%;
+    border: solid 2px black;
+}
+
+#cantNombres{
+    margin-top: 10px;
+    width: 30px;
+}
+
+#apellido{
+    margin-top: 10px;
+    width: 57%;
+    margin-bottom: 10px; /* lo coloco aca por no se como acceder id de genero */
+}
+
+/* #generos{
+} */
+
+#btnGenerar{
+    margin-top: 20px;
+    width: 100%;
+    /* font-weight: bold; */
+    font-style: italic;
+    font-size: 20px;
+}
+
+#resultado{
+    margin-top: 20px;
+    font-size: 25px;
+    border-radius: 2%;
+    border: solid black 2px;
+    width: 430px;
+
+}
+
+
+
+
+/**************************************LOADER*SPINNER********************************/
+.loader {
+    font-size: 3px;
+    margin: auto;
+    text-indent: -9999em;
+    width: 11em;
+    height: 11em;
+    border-radius: 50%;
+    background: #ffffff;    
+    background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+    position: relative;
+    -webkit-animation: load3 1.4s infinite linear;
+    animation: load3 1.4s infinite linear;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  .loader:before {
+    width: 50%;
+    height: 50%;
+    background: #ffffff;
+    border-radius: 100% 0 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+  }
+  .loader:after {
+    background: lightblue;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    content: '';
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+  @-webkit-keyframes load3 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes load3 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }

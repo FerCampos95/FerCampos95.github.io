@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Nombres</title>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"> -->
+
+    <link rel="stylesheet" href="nombres.css">
+</head>
+<body>
+    <div id="padre" class="center">
+        <h1>Generador de Nombres</h1>
+
+        <div id="formulario" class="form-group">
+            <label>Seleccione el origen del Nombre:
+                <select id="origen">
+                    <option value="seleccione">Seleccione un Origen</option>
+                    <option value="Argentina">Argentino</option>
+                    <option value="Brazil">Brasilero</option>
+                    <option value="France">Frances</option>
+                    <option value="Italy">Italiano</option>
+                    <option value="Spain">Español</option>
+                    <option value="United States">Estadounidense</option>
+                </select>
+            </label>
+            <label>Seleccione la cantidad de nombres:
+                <input type="number" id="cantNombres" value="2">
+            </label>
+            <br>
+            <label>Ingrese el/los Apellido/s:
+                <input type="text" id="apellido">  
+            </label>
+            <br>
+            <label id="generos">Seleccione el Género:
+                <radiogroup>
+                    <label><input type="radio" name="genero" value="female">Femenino</label>
+                    <label><input type="radio" name="genero" value="male">Masculino</label>
+                </radiogroup>
+            </label>
+            
+            <br>
+            <input id="btnGenerar" type="submit" value="Generar">
+        </div>
+            
+        <div id="resultado">
+            <label id="generados">Nombre Generado</label>
+            <div id="loader" class="loader" hidden=true>Loading...</div>
+        </div>
+
+    </div>
+    
+    <script src="nombres2.js"></script>
+</body>
+</html>
