@@ -51,7 +51,6 @@ body{
     border-radius: 2%;
     border: solid black 2px;
     width: 430px;
-
 }
 
 
@@ -121,3 +120,81 @@ body{
       transform: rotate(360deg);
     }
   }
+
+
+
+
+/************media responsive*********/
+@media screen and (max-width:400px) {
+    body{
+        text-align: center;
+    }
+    #padre{
+        padding: 2%;
+        background-color: lightblue;
+        display: inline-block;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: center;
+        text-align: center;
+        border-radius: 1%;
+    
+    }
+
+    #formulario{
+        display: flexbox;
+        /* flex-direction: row; */
+        /* text-align: justify; */
+        width: 300px;
+        padding: 15px;
+        border-radius: 2%;
+        border: solid 2px black;
+    }
+
+    #origen{
+        width: 300px;
+        margin-bottom: 15px;
+    }
+
+    #cantNombres{
+        width: 30px;
+        margin-bottom: 15px;
+    }
+
+    #apellido{
+        width: 100%;
+        margin-top: -10px;
+        
+    }
+
+    #labelGenero{
+        /* background-color: blue; */
+        /* width: 100px; */
+        /* margin-top: 150px; */
+        /* margin-right: 100%; */
+    }
+
+    #genero{
+        /* background-color: brown; */
+        /* margin-left: 36%; */
+        /* margin-right: 115px; */
+        /* width: 100%; */
+    } 
+
+    #btnGenerar{
+        margin-top: 20px;
+        width: 100%;
+        /* font-weight: bold; */
+        font-style: italic;
+        font-size: 20px;
+    }
+
+    #resultado{
+        margin-top: 20px;
+        font-size: 25px;
+        border-radius: 2%;
+        border: solid black 2px;
+        width: 330px;
+    }
+
+}
