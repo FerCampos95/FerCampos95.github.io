@@ -1,0 +1,118 @@
+#padre{
+    background-color: black;
+    color: ivory;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    text-align: center;
+}
+
+    #login{
+        background-color: green;
+        display: flex;
+        flex-direction: column;
+        /* flex-wrap: nowrap; */
+        /* text-align: center; */
+        align-items: center;
+        margin: 0px 20% 0px 20%;
+        padding: 30px;
+    }
+
+    #info{ /*CONTIENE LAS SALAS Y LOS USUARIOS*/
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        margin: 30px;
+        /* text-align: center; */
+    }
+        #usuarios{
+            background-color: blue;
+            /* display: flex; */
+            flex: 1 1 auto;
+            margin-right: 15px;
+            padding: 15px;
+
+        }
+        #salas{
+            background-color: red;
+            /* display: flex; */
+            flex: 1 1 auto;
+            margin-left: 15px;
+            padding: 15px;
+            /* flex-direction: column; */
+        }
+        #modal-crear-sala{
+            background-color: brown;
+            flex: 1 1 auto;
+            margin-left: 15px;
+        }
+        
+
+    #sala-seleccionada{
+        background-color: hotpink;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 2%;
+    }
+        #header-sala{
+            /* flex: 1 1 auto; */
+            background-color: magenta;
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        #juego{
+            flex: 1 1 auto;
+            background-color: navy;
+            /* text-align: center; */
+        }
+        #info-y-chat{
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+        }
+            #usuarios-sala{
+                background-color: indigo;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                margin-left: 10px;
+                margin-bottom: 10px;
+                /* text-align: center; */
+            }
+            #chat-sala{
+                background-color:mediumspringgreen;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                margin-left: 10px;
+                /* text-align: center; */
+            }
+
+
+.oculto{
+    display: none;
+}
+/* .visible{
+    display: flex;
+} */
+
+ul{
+    display: flex;
+    flex-direction: column;
+}
+li{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* #modal-crear-sala{
+	
+} */

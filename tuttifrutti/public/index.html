@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutti Frutti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximun-scale=1.0, minimun-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div id="padre">
+        <h1>Bienvenido al TuttiFrutti</h1>
+
+        <!-- INICIO DE SESION -->
+        <div id="login">
+            <h2>Iniciar Sesion</h2>
+            <p id="requisitos">Ingrese su nombre de Usuario (1-15 Caracteres)</p>
+            <div style="display:flex; align-items: center;">
+                <label id="label-caracteres">*</label>
+                <input id="input-usuario"type="text">
+            </div>
+            <button id="btn-iniciar">Iniciar</button>
+        </div>
+
+        <!-- INFO GENERAL -->
+        <section id="info">
+            <div id="usuarios">
+                <h2>Usuarios conectados</h2>
+                <li>
+                    <p>----Usuario----</p>
+                    <p>----------En la Sala----------</p>
+                </li>
+                <ul id="ul-conectados">
+                    <li id="li-conectados">
+                        <p>nombre usuario</p>
+                        <p>sala en la que esta</p>
+                    </li>
+                </ul>
+            </div>
+            <div id="salas" >
+                <h2>Salas</h2>
+                <li>
+                    <p>-------Nombre de la sala-------</p>
+                    <p>-N° Conectados-</p>
+                </li>
+                <ul id="ul-salas">
+                    <li id="li-salas">
+                        <button>Unirse</button><p>Nombre de la sala</p><p>N° Conectados</p>
+                    </li>
+                </ul>
+                <button id="btn-crear-sala">Crear Sala</button>
+            </div> 
+            <!-- VENTANA MODAL PARA CREAR UNA SALA NUEVA -->
+            <div id="modal-crear-sala" class="oculto">
+                <h3>Crear Sala</h3>
+                <p>Ingrese el nombre de la sala</p>
+                <p id="requisitos-sala">Entre 1 y 30 Caracteres</p>
+                <div>
+                    <label id="label-caracteres-sala">*</label>
+                    <input id="input-crear-sala"type="text">
+                </div>
+                <button id="btn-finalizar-crear-sala">Finalizar</button>
+                <button id="btn-cancelar-crear-sala">Cancelar</button>
+
+            </div>
+
+        </section>
+            
+        <!-- SALA SELECCIONADA -->
+        <div id="sala-seleccionada">
+            <div id="header-sala">
+                <h2>Sala: Nombre de la Sala</h2>
+                <button>Salir de la sala</button>
+            </div>
+            
+
+            <div id="juego">
+                <h2>Letra: "L"</h2>
+                <ul id="ul-categoria">
+                    <li id="li-categoria">
+                        <label id="label-categoria">Nombres:
+                            <input id="cat-2" type="text">
+                        </label>
+                    </li>
+                    <li id="li-categoria">
+                        <label id="label-categoria">Frutas/Verduras
+                            <input id="cat-1" type="text">
+                        </label>
+                    </li>
+                </ul>
+                <button>Basta para todos</button>
+            </div>
+            <div id="info-y-chat">
+                <div id="usuarios-sala">
+                    <h3>Usuarios en esta Sala</h3>
+                    <ul class="ul-usuarios">
+                        <li clas="li-usuarios">
+                            <p>nombre usuario</p>
+                            <p>puntaje</p>
+                        </li>
+                    </ul>
+                </div>
+                <div id="chat-sala">
+                    <h3>Chat de la Sala</h3>
+                    <div id="mensajes">
+                        <ul id="ul-mensajes">
+                            <li id="li-mensajes">
+                                <label>Nombre usuario</label>
+                                <p>Este es un mensaje</p>
+                                <label>10:25</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <p>Alguien esta escribiendo</p>
+                    <div id="barra-mensaje">
+                        <textarea id="input-mensaje"></textarea>
+                        <button>Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+    
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="tuttifrutti.js"></script>
+</body>
+</html>
