@@ -1,5 +1,9 @@
 const socket= io();
 
+let datosUsuario={
+    nombreUsuario:"",
+    salaUsuario:"Ninguna-Sala"
+}
 ////////////////////////////////////////////////LOGIN//////////////////////////////////////////////
 //VARIABLES     //Login
 let inputUsuario= document.getElementById("input-usuario");
@@ -55,13 +59,14 @@ function iniciarSesion(e){
 
         socket.emit("nuevoConectado",usuario);
         document.getElementById("login").style.display="none";
+        datosUsuario.nombreUsuario=usuario;
     }
 }
 
 ///ESCUCHAS DEL SOCKET
 socket.on("pedirConectados", (data)=>{
     listaUsuarios= data;
-    console.log(listaUsuarios);
+    // console.log(listaUsuarios);
     let ulConectados= document.getElementById("ul-conectados");
     while(ulConectados.firstChild){
         ulConectados.removeChild(ulConectados.firstChild);
@@ -87,7 +92,7 @@ socket.on("pedirConectados", (data)=>{
 //////////////////////////////////////////////SALAS////////////////////////////////////////////////
 //VARIABLES     //Salas
 let btnCrearSala= document.getElementById("btn-crear-sala");
-// let btnUnirse= document.getElementById("btn-unirse");
+let btnUnirse= document.getElementsByClassName("btn-unirse");
 let divSalas= document.getElementById("salas");
 let modalCrearSala= document.getElementById("modal-crear-sala");
 let btnFinalizarCrearSala= document.getElementById("btn-finalizar-crear-sala");
@@ -99,7 +104,6 @@ let listaSalas=new Array();
 let nombreSala="";
 
 //LLAMADOS AUTOMATICOS
-    //DEBO PEDIR LA LISTA DE SALAS Y SUS CONECTADOS
 socket.emit("pedirSalas");
 
 //LISTENERS
@@ -111,9 +115,14 @@ inputNombreSala.addEventListener("keyup",crearSalaConEnter);
 
 //FUNCIONES
 function mostrarCrearSala(e){
-    divSalas.classList.add("oculto");
-    modalCrearSala.classList.remove("oculto");
-    inputNombreSala.focus();
+    if(datosUsuario.salaUsuario=="Ninguna-Sala"){//si no tiene sala puede crear
+        divSalas.classList.add("oculto");
+        modalCrearSala.classList.remove("oculto");
+        inputNombreSala.focus();
+    }else{
+        window.alert("Usted ya se encuentra en una sala, no puede crear otra");
+    }
+    
 }
 function ocultarCrearSala(e){
     divSalas.classList.remove("oculto");
@@ -155,6 +164,7 @@ function validarSala(e){
 }
 
 function crearSala(e){
+    
     if(validarSala(e)){
         let info ={
             nombreSala: nombreSala,
@@ -162,15 +172,39 @@ function crearSala(e){
         }
         socket.emit("nuevaSala",info);
         socket.emit("conectarseASala",nombreSala);
-        // console.log("salaCreada");
+        datosUsuario.salaUsuario=nombreSala;
         
         ocultarCrearSala();
     }
+    
 }
 function crearSalaConEnter(e){
     if(e.keyCode==13){
         crearSala(e);
     }
+}
+
+function eventoUnirseSala(e){
+    e.preventDefault();
+    // console.log(datosUsuario.salaUsuario);
+    
+    if(e.target.className!=="btn-unirse"){//si la clase no es la del boton no hago nada
+        return;
+    }
+
+    if(datosUsuario.salaUsuario=="Ninguna-Sala"){
+        nombreSala="";
+        e.target.parentElement.childNodes.forEach( (nodo)=>{ //recorro todos los childNodes hasta la clase sala
+            if(nodo.className=="nombre-sala"){
+                nombreSala=nodo.innerText;
+            }
+        })
+        datosUsuario.salaUsuario=nombreSala;
+        socket.emit("conectarseASala",nombreSala);
+    }else{
+        window.alert("Usted ya se encuentra en una sala");
+    }
+        
 }
 
 //ESCUCHAS DEL SOCKET
@@ -193,6 +227,7 @@ socket.on("pedirSalas",(data)=>{
 
         let pNombreSala= document.createElement("p");
         pNombreSala.innerText=sala.nombreSala;
+        pNombreSala.className="nombre-sala"
 
         let pCantConectados= document.createElement("p");
         pCantConectados.innerText=sala.cantConectados; 
@@ -201,7 +236,16 @@ socket.on("pedirSalas",(data)=>{
         liSala.appendChild(pNombreSala);
         liSala.appendChild(pCantConectados);
 
+        liSala.addEventListener("click",eventoUnirseSala);
         ulSalas.appendChild(liSala);
     })
 
+})
+
+
+
+
+///DEBUGEANDO
+socket.on("ver", (datos)=>{
+    console.log(datos);
 })

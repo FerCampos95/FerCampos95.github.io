@@ -103,6 +103,11 @@
     display: flex;
 } */
 
+.deshabilitado{
+    /* visibility: hidden; */
+    display: none;
+}
+
 ul{
     display: flex;
     flex-direction: column;

@@ -41,12 +41,23 @@ io.on("connection", (socket)=>{
         io.emit("pedirConectados",listaConectados);
     })
 
-    socket.on("conectarseASala", (sala)=>{
-        listaConectados.forEach( (u)=>{
+    socket.on("conectarseASala", (sala)=>{ 
+        let usuario="";
+        listaConectados.forEach( (u)=>{//al usuario le asigna una sala
             if(u.idUsuario== socket.id){
                 u.nombreSala= sala;
+                usuario=u.nombreUsuario;
             }
         })
+
+        listaSalas.forEach( (s)=>{
+            if(s.nombreSala== sala){
+                s.conectados.push(usuario);
+                s.cantConectados++;
+            }
+        })
+
+        io.emit("pedirSalas",listaSalas);
         io.emit("pedirConectados",listaConectados);
     })
 
@@ -66,17 +77,28 @@ io.on("connection", (socket)=>{
     })
 
     ////FUNCIONES PARA SALAS
+    // socket.on("nuevaSala", (info)=>{
+    //     datosSala={
+    //         nombreSala: info.nombreSala,
+    //         adminSala: info.adminSala,
+    //         cantConectados: 1,
+    //         conectados: new Array()
+    //     }
+    //     datosSala.conectados.push(info.adminSala);
+    //     listaSalas.push(datosSala);
+    //     io.emit("pedirSalas",listaSalas);
+    // })
     socket.on("nuevaSala", (info)=>{
         datosSala={
             nombreSala: info.nombreSala,
             adminSala: info.adminSala,
-            cantConectados: 1,
+            cantConectados: 0,
             conectados: new Array()
         }
-        datosSala.conectados.push(info.adminSala);
         listaSalas.push(datosSala);
         io.emit("pedirSalas",listaSalas);
     })
+
 
     socket.on("pedirSalas", ()=>{
         io.emit("pedirSalas",listaSalas);
@@ -87,7 +109,7 @@ io.on("connection", (socket)=>{
             if(sala.nombreSala== nombreSala){ //la encuentro
                 sala.cantConectados--; //quito 1 de la cantidad de conectados
                 sala.conectados.forEach( (u,index)=>{ //busco el conectado
-                    if(u.nombreUsuario == nombreUsuario){ //lo encuentro
+                    if(u == nombreUsuario){ //lo encuentro
                         sala.conectados.splice(index,1); //lo quito
                     }
                 })
@@ -95,9 +117,15 @@ io.on("connection", (socket)=>{
                 if(sala.cantConectados==0){ //si la sala esta vacia
                     listaSalas.splice(index,1); //elimino esta sala
                 }else{
-                    sala.adminSala= sala.conectados[0].nombreUsuario; //sino, pongo como admin al primero de la lista
+                    sala.adminSala= sala.conectados[0]; //sino, pongo como admin al primero de la lista
                 }
             }
         })
     }
+    
+    
+    
+    //io.emit("ver",datos); //este es para ver los datos desde la consola del navegador
 })
+
+
