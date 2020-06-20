@@ -1,8 +1,10 @@
 const socket= io();
+const TIMEOUTESPERA=1000;
 
 let datosUsuario={
     nombreUsuario:"",
-    salaUsuario:"Ninguna-Sala"
+    salaUsuario:"Ninguna-Sala",
+    puntajeUsuario:0
 }
 ////////////////////////////////////////////////LOGIN//////////////////////////////////////////////
 //VARIABLES     //Login
@@ -11,10 +13,9 @@ let btnIniciarSesion= document.getElementById("btn-iniciar");
 let labelCaracteres= document.getElementById("label-caracteres");
 let requisitosUsuario= document.getElementById("requisitos");
 let listaUsuarios= new Array();
+let listaUsuariosMiSala= new Array;
 let usuario="";
-
-//EJECUCIONES INICIALES
-socket.emit("pedirConectados");
+let divUsuariosYSalas= document.getElementById("info");
 
 //LISTENERS
 inputUsuario.addEventListener("keyup",validarUsuario);
@@ -59,6 +60,7 @@ function iniciarSesion(e){
 
         socket.emit("nuevoConectado",usuario);
         document.getElementById("login").style.display="none";
+        mostrarUsuariosYSalas();
         datosUsuario.nombreUsuario=usuario;
     }
 }
@@ -66,13 +68,26 @@ function iniciarSesion(e){
 ///ESCUCHAS DEL SOCKET
 socket.on("pedirConectados", (data)=>{
     listaUsuarios= data;
+    
     // console.log(listaUsuarios);
     let ulConectados= document.getElementById("ul-conectados");
     while(ulConectados.firstChild){
         ulConectados.removeChild(ulConectados.firstChild);
     }
 
+    //agarrando datos de mi propio usuario
+    let mio= listaUsuarios.find( listaUsuarios => listaUsuarios.nombreUsuario==datosUsuario.nombreUsuario);
+    if(mio!= undefined){ //porque cuando inicia pide los conectados y no me encuentra
+        datosUsuario.salaUsuario=mio.nombreSala; //xq quizas cambio de sala
+        datosUsuario.puntajeUsuario= mio.puntajeUsuario;//actualizo mi puntaje
+    }
+
+    listaUsuariosMiSala=new Array();
     listaUsuarios.forEach( (u)=>{
+        if(u.nombreSala== datosUsuario.salaUsuario){  //si uno de esos esta en mi sala
+            listaUsuariosMiSala.push(u); //lo agrego en la lista de mi sala
+        }
+        
         let liConectado= document.createElement("li");
         liConectado.id="li-conectados";
 
@@ -87,8 +102,16 @@ socket.on("pedirConectados", (data)=>{
 
         ulConectados.appendChild(liConectado);
     })
+
 })
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////SALAS////////////////////////////////////////////////
 //VARIABLES     //Salas
 let btnCrearSala= document.getElementById("btn-crear-sala");
@@ -102,9 +125,11 @@ let labelCaracteresSala= document.getElementById("label-caracteres-sala");
 let pRequisitosSala= document.getElementById("requisitos-sala");
 let listaSalas=new Array();
 let nombreSala="";
+//VARIABLES         //Salas seleccionada
+let btnSalirDeSala= document.getElementById("btn-salir-sala");
+let tituloDeSala = document.getElementById("titulo-sala");
+let divSalaSeleccionada = document.getElementById("sala-seleccionada");
 
-//LLAMADOS AUTOMATICOS
-socket.emit("pedirSalas");
 
 //LISTENERS
 btnCrearSala.addEventListener("click",mostrarCrearSala);
@@ -112,6 +137,8 @@ btnFinalizarCrearSala.addEventListener("click", crearSala);
 btnCancelarCrearSala.addEventListener("click", ocultarCrearSala);
 inputNombreSala.addEventListener("keyup",validarSala);
 inputNombreSala.addEventListener("keyup",crearSalaConEnter);
+
+btnSalirDeSala.addEventListener("click", salirDeSala);
 
 //FUNCIONES
 function mostrarCrearSala(e){
@@ -139,6 +166,13 @@ function validarSala(e){
 
         return false;
     }else{
+        letras=nombreSala.split(" ");
+        if(letras.length>1){
+            pRequisitosSala.innerText="El nombre no puede contener espacios";
+            inputNombreSala.style.color="red";
+            return false;
+        }
+        
         if(nombreSala=="Ninguna-Sala"){
             pRequisitosSala.innerText="Nombre de Sala no permitido, intente otro";
             inputNombreSala.style.color="red";
@@ -172,13 +206,15 @@ function crearSala(e){
         }
         socket.emit("nuevaSala",info);
         socket.emit("conectarseASala",nombreSala);
-        datosUsuario.salaUsuario=nombreSala;
+        tituloDeSala.innerText="Conectado a: "+nombreSala;
+        // datosUsuario.salaUsuario=nombreSala; //no necesario xq lo hace en el pedir sala
         
         ocultarCrearSala();
+        mostrarSalaSeleccionada();
     }
     
 }
-function crearSalaConEnter(e){
+function crearSalaConEnter(e){    
     if(e.keyCode==13){
         crearSala(e);
     }
@@ -201,11 +237,64 @@ function eventoUnirseSala(e){
         })
         datosUsuario.salaUsuario=nombreSala;
         socket.emit("conectarseASala",nombreSala);
+        socket.emit("actualizarMiSala",nombreSala);
+        divSalaSeleccionada.style.display="flex";
+        
     }else{
         window.alert("Usted ya se encuentra en una sala");
     }
         
 }
+
+function salirDeSala(){
+    if(window.confirm("Seguro desea salir de la Sala? Su puntaje se perderá.")){//acepta salir de la sala
+        socket.emit("salirDeSala");
+        socket.emit("pedirConectados");
+        socket.emit("pedirSalas");
+        
+        divSalaSeleccionada.style.display="none"; //mantengo oculta la sala
+        socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
+        
+    }
+}
+
+function cargarDatosDeLaSala(nombreDeSala){
+    // tituloDeSala.innerText="Conectado a: "+nombreDeSala;
+    // //listaUsuariosMiSala  -> esta variable la cargo con los usuarios q estan en mi sala al traer a los conectados
+    // let datosSala= listaSalas.find(listaSalas => listaSalas.nombreSala== nombreDeSala)//busco los datos de esta sala para obtener el admin
+    // let adminSala= datosSala.adminSala;
+
+    // let ulConectadosSala= document.getElementById("ul-conectados-sala");
+    // while(ulConectadosSala.firstChild){
+    //     ulConectadosSala.removeChild(ulConectadosSala.firstChild);
+    // }
+
+    // listaUsuariosMiSala.forEach( (u)=>{
+
+    //     let liConectadoSala= document.createElement("li");
+    //     liConectadoSala.id="li-conectados-sala";
+
+    //     let pNombre= document.createElement("p");
+    //     pNombre.innerText=u.nombreUsuario;
+    //     if(u.nombreUsuario==adminSala){
+    //         pNombre.innerText+=" (ADMIN)";
+    //     }
+
+    //     let pPuntaje = document.createElement("p");
+    //     pPuntaje.innerText=u.puntajeUsuario;
+
+    //     liConectadoSala.appendChild(pNombre);
+    //     liConectadoSala.appendChild(pPuntaje);
+
+    //     ulConectadosSala.appendChild(liConectadoSala);
+    // })
+
+}
+
+function mostrarSalaSeleccionada(){ divSalaSeleccionada.style.display="flex";}
+function ocultarSalaSeleccionada(){ divSalaSeleccionada.style.display="none";}
+function mostrarUsuariosYSalas(){ divUsuariosYSalas.style.display="flex"};
+function ocultarUsuariosYSalas(){ divUsuariosYSalas.style.display="none"};
 
 //ESCUCHAS DEL SOCKET
 socket.on("pedirSalas",(data)=>{
@@ -240,6 +329,45 @@ socket.on("pedirSalas",(data)=>{
         ulSalas.appendChild(liSala);
     })
 
+    socket.on("actualizarMiSala", (miSala)=>{
+        setTimeout( ()=>{
+            tituloDeSala.innerText="Conectado a: "+miSala;
+            //listaUsuariosMiSala  -> esta variable la cargo con los usuarios q estan en mi sala al traer a los conectados
+            let datosSala= listaSalas.find(listaSalas => listaSalas.nombreSala== miSala)//busco los datos de esta sala para obtener el admin
+            let adminSala="";
+            
+            if(datosSala!==undefined){
+                adminSala= datosSala.adminSala;
+            }else{
+                adminSala= datosUsuario.nombreUsuario;
+            }
+
+            let ulConectadosSala= document.getElementById("ul-conectados-sala");
+            while(ulConectadosSala.firstChild){
+                ulConectadosSala.removeChild(ulConectadosSala.firstChild);
+            }
+
+            listaUsuariosMiSala.forEach( (u)=>{
+
+                let liConectadoSala= document.createElement("li");
+                liConectadoSala.id="li-conectados-sala";
+
+                let pNombre= document.createElement("p");
+                pNombre.innerText=u.nombreUsuario;
+                if(u.nombreUsuario==adminSala){
+                    pNombre.innerText+=" (ADMIN)";
+                }
+
+                let pPuntaje = document.createElement("p");
+                pPuntaje.innerText=u.puntajeUsuario;
+
+                liConectadoSala.appendChild(pNombre);
+                liConectadoSala.appendChild(pPuntaje);
+
+                ulConectadosSala.appendChild(liConectadoSala);
+            })
+        },TIMEOUTESPERA);
+    })
 })
 
 
@@ -249,3 +377,10 @@ socket.on("pedirSalas",(data)=>{
 socket.on("ver", (datos)=>{
     console.log(datos);
 })
+
+
+//EJECUCIONES INICIALES - LLAMADOS AUTOMATICOS
+socket.emit("pedirConectados");
+socket.emit("pedirSalas");
+ocultarUsuariosYSalas();
+ocultarSalaSeleccionada();

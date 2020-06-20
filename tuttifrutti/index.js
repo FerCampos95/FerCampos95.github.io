@@ -3,6 +3,7 @@ const path= require("path");
 const express= require("express");
 const SocketIO = require("socket.io");
 const { Socket } = require("dgram");
+// const { Socket } = require("dgram");
 const app =express();
 
 //configuracion del puerto
@@ -31,7 +32,8 @@ io.on("connection", (socket)=>{
         info={
             nombreUsuario: usuario,
             idUsuario: socket.id,
-            nombreSala: "Ninguna-Sala"
+            nombreSala: "Ninguna-Sala",
+            puntajeUsuario:0
         }
         listaConectados.push(info);
         io.emit("pedirConectados",listaConectados);
@@ -67,6 +69,7 @@ io.on("connection", (socket)=>{
             if(usuario.idUsuario == socket.id){
                 if(usuario.nombreSala !== "Ninguna-Sala"){//es decir, el usuario estaba en una sala
                     quitarloDeSala(usuario.nombreUsuario,usuario.nombreSala); //lo quito de la sala
+                    io.emit("actualizarMiSala",usuario.nombreSala);
                 }
                 listaConectados.splice(index,1);
             }
@@ -77,17 +80,6 @@ io.on("connection", (socket)=>{
     })
 
     ////FUNCIONES PARA SALAS
-    // socket.on("nuevaSala", (info)=>{
-    //     datosSala={
-    //         nombreSala: info.nombreSala,
-    //         adminSala: info.adminSala,
-    //         cantConectados: 1,
-    //         conectados: new Array()
-    //     }
-    //     datosSala.conectados.push(info.adminSala);
-    //     listaSalas.push(datosSala);
-    //     io.emit("pedirSalas",listaSalas);
-    // })
     socket.on("nuevaSala", (info)=>{
         datosSala={
             nombreSala: info.nombreSala,
@@ -99,9 +91,32 @@ io.on("connection", (socket)=>{
         io.emit("pedirSalas",listaSalas);
     })
 
-
     socket.on("pedirSalas", ()=>{
         io.emit("pedirSalas",listaSalas);
+    })
+
+    socket.on("salirDeSala", ()=>{
+        let usuario="nulo";
+        let sala="nulo";
+        listaConectados.forEach( (u)=>{//recorro los usuarios
+            if(u.idUsuario== socket.id){ //busco el que emitio el pedido
+                sala=u.nombreSala;     //guardo la sala en la que esta
+                u.nombreSala="Ninguna-Sala";//le quito la sala en la que esta
+                u.puntajeUsuario=0,
+                usuario=u.nombreUsuario; //guardo el nombre de usuario
+            }
+        })
+
+        quitarloDeSala(usuario,sala);
+
+        io.emit("pedirSalas",listaSalas);
+        io.emit("pedirConectados",listaConectados);
+    })
+
+    socket.on("actualizarMiSala", (miSala)=>{
+        io.emit("pedirSalas",listaSalas);
+        io.emit("pedirConectados",listaConectados);
+        io.emit("actualizarMiSala",miSala);
     })
 
     function quitarloDeSala(nombreUsuario, nombreSala){
