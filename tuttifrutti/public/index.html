@@ -63,6 +63,15 @@
                 <button id="btn-cancelar-crear-sala">Cancelar</button>
 
             </div>
+            <div id="conectados-sala">
+                <h2>Usuarios conectados en esta Sala</h2>
+                <ul id="ul-conectados-sala">
+                    <li id="li-conectados-sala">
+                        <p>nombre usuario</p>
+                        <p>puntaje</p>
+                    </li>
+                </ul>
+            </div>
 
         </div>
             
@@ -91,29 +100,31 @@
                 <button>Basta para todos</button>
             </div>
             <div id="info-y-chat">
-                <div id="conectados-sala">
-                    <h3>Usuarios conectados en esta Sala</h3>
-                    <ul id="ul-conectados-sala">
-                        <li id="li-conectados-sala">
-                            <p>nombre usuario</p>
-                            <p>puntaje</p>
-                        </li>
-                    </ul>
-                </div>
+                
                 <div id="chat-sala">
-                    <h3>Chat de la Sala</h3>
+                    <h2>Chat de la Sala</h2>
                     <div id="mensajes">
                         <ul id="ul-mensajes" class="ul-mensajes">
-                            <li id="li-mensajes" class="li-mensajes">
-                                <p>Nombre usuario</p>
-                                <p>Este es un mensaje</p>
-                                <p>10:25</p>
+                            <li id="li-mensajes" class="li-mensajes ">
+                                <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje</p>
+                                <p class="hora">10:25</p>
+                            </li>
+                            <li id="li-mensajes" class="li-mensajes ">
+                                <p class="usr">Usuario</p>
+                                <p class="msj">Este es otro mensaje</p>
+                                <p class="hora">10:25</p>
+                            </li>
+                            <li id="li-mensajes" class="li-mensajes mensaje-mio">
+                                <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje mio</p>
+                                <p class="hora">10:25</p>
                             </li>
                         </ul>
                     </div>
                     <p id="p-estado">Alguien esta escribiendo</p>
                     <div id="barra-mensaje">
-                        <textarea id="input-mensaje"></textarea>
+                        <textarea id="input-mensaje" placeholder="Escriba aquí su mensaje.."></textarea>
                         <button id="btn-enviar-mensaje">Enviar</button>
                     </div>
                 </div>

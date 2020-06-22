@@ -46,6 +46,17 @@
             flex: 1 1 auto;
             margin-left: 15px;
         }
+        #conectados-sala{
+            background-color: indigo;
+            flex: 1 1 auto;
+            margin-left: 15px;
+            padding: 15px;
+            /* display: flex;
+            flex-direction: column; */
+            /* flex-wrap: nowrap; */
+            /* margin-left: 10px;
+            margin-bottom: 10px; */
+        }
         
 
     #sala-seleccionada{
@@ -70,31 +81,82 @@
             flex: 1 1 auto;
             background-color: navy;
             /* text-align: center; */
+            max-width: 50%;
         }
         #info-y-chat{
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
             flex-wrap: nowrap;
+            max-width: 50%;
         }
-            #usuarios-sala{
-                background-color: indigo;
-                display: flex;
-                flex-direction: column;
-                flex-wrap: nowrap;
-                margin-left: 10px;
-                margin-bottom: 10px;
-                /* text-align: center; */
-            }
+            
             #chat-sala{
                 background-color:mediumspringgreen;
                 display: flex;
                 flex-direction: column;
                 flex-wrap: nowrap;
                 margin-left: 10px;
+                height: 500px;
+                
                 /* text-align: center; */
             }
+                #mensajes{
+                    background-color: brown;
+                    height: 67%;
+                    max-height: 67%;
+                    overflow-y: scroll;
+                }
+                .ul-mensajes{
+                    display: flex;
+                    margin-left: -10px;
+                }
+                .li-mensajes{
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: left;
+                    align-items: baseline;
+                    margin-top: -25px;
+                }
+                .li-mensajes > p{
+                    margin-right: 2%;
+                }
+                .usr{
+                    background-color: violet;
+                    max-width: 135px; /*entran 15 caracteres*/
+                    font-weight: bold;
+                    font-style: italic;
+                    text-decoration-line: underline;
+                }
+                .hora{
+                    font-size: 65%;
+                }
+                
+                .mensaje-mio{
+                    flex-direction: row-reverse;
+                }
+                .se-a-unido-a-sala{
 
+                }
+                .abandonado-la-sala{
+                    
+                }
+                #p-estado{
+                    margin-top: 3px;
+                    background-color: cadetblue;
+                }
+                #barra-mensaje{
+                    background-color: coral;
+                    display: flex;
+                    height: 10%;
+                }
+                #input-mensaje{
+                    width: 90%;
+                    resize: none;
+                }
+                #btn-enviar-mensaje{
+                    background-color: darkorchid;
+                }
 
 .oculto{
     display: none;
@@ -122,9 +184,3 @@ li{
 	
 } */
 
-.se-a-unido-a-sala{
-
-}
-.abandonado-la-sala{
-    
-}

@@ -419,6 +419,7 @@ function enviarMensaje(e){
         hora:tiempo.getHours()+":"+tiempo.getMinutes()
     }
     socket.emit("enviarMensaje",datos);    //emito el mensajes a los demas
+    
     inputMensaje.value="";
     inputMensaje.focus();
 }
@@ -427,15 +428,25 @@ function eventoTeclaInputMensaje(e){
     if(e.keyCode==13){  //quiere decir que la tecla era el enter
         enviarMensaje(e);
         //TAMBIEN TENGO QUE QUITAR AL ESCRITOR DE LA LISTA
-        return;
+        // return;
+    }
+    
+    //caso contratrio aviso quien esta escribiendo
+
+    console.log(misEscritores.find(misEscritores => datosUsuario.nombreUsuario));
+    
+    if(inputMensaje.value!==""){//tengo algo escrito
+        if(misEscritores.find(misEscritores => datosUsuario.nombreUsuario)!==datosUsuario.nombreUsuario){ //si no estoy en la lista de escritores
+            misEscritores.push(datosUsuario.nombreUsuario);//me agrego
+        }
+            
+    }else{//no tengo algo escrito
+        let miPosicion=misEscritores.indexOf(datosUsuario.nombreUsuario);//busco mi indice
+        if(miPosicion !== -1){ //es decir, si estoy en la lista de escritores
+            misEscritores.splice(miPosicion,1);//me elimino de la lista
+        } 
     }
 
-    //caso contratrio aviso quien esta escribiendo
-    console.log(misEscritores.find(misEscritores => datosUsuario.nombreUsuario));
-    if(misEscritores.find(misEscritores => datosUsuario.nombreUsuario)!==datosUsuario.nombreUsuario){ //si no estoy en la lista de escritores
-        misEscritores.push(datosUsuario.nombreUsuario);
-    }
-        
     let datos={
         listaReceptores:listaUsuariosMiSala,
         escritores: misEscritores
@@ -450,14 +461,21 @@ function crearLiMensaje(usuario,mensaje,hora){
 
     let pUsuario= document.createElement("p");
     pUsuario.innerText= usuario;
+    pUsuario.classList.add("usr");
+
+    let pDosPuntos= document.createElement("p");
+    pDosPuntos.innerText=":";
 
     let pMensaje= document.createElement("p");
     pMensaje.innerText= mensaje;
+    pMensaje.classList.add("msj");
 
     let pHora= document.createElement("p");
     pHora.innerText= hora;
+    pHora.classList.add("hora");
 
     liMensaje.appendChild(pUsuario);
+    liMensaje.appendChild(pDosPuntos);
     liMensaje.appendChild(pMensaje);
     liMensaje.appendChild(pHora);
 
@@ -466,12 +484,12 @@ function crearLiMensaje(usuario,mensaje,hora){
 
 ///SOCKETS CHATS
 socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por id de socket
-    // datos=> contiene el usuario, el mensaje y la hora
+    // datos=> contiene el usuario,dos puntos, el mensaje y la hora
     let liMensaje= crearLiMensaje(datos.usuario,datos.mensaje,datos.hora);
     if(datosUsuario.nombreUsuario == datos.usuario){//si mi nombre es el mismo que el que envio
         liMensaje.classList.add("mensaje-mio");
     }else{
-        liMensaje.classList.add("mensaje-otro");
+        // liMensaje.classList.add("mensaje-otro");
     }
 
     if(datos.mensaje== "SE HA UNIDO A ESTA SALA"){
@@ -481,6 +499,8 @@ socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por 
     }
 
     ulMensajes.appendChild(liMensaje);
+    let divMensajes= document.getElementById("mensajes");
+    divMensajes.scrollTop= divMensajes.scrollHeight;
 })
 
 socket.on("escribiendo", (escritores)=>{
