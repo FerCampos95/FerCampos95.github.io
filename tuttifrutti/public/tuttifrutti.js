@@ -83,9 +83,11 @@ socket.on("pedirConectados", (data)=>{
     }
 
     listaUsuariosMiSala=new Array();
+    // cantConectadosEnMiSala=0;
     listaUsuarios.forEach( (u)=>{
         if(u.nombreSala== datosUsuario.salaUsuario){  //si uno de esos esta en mi sala
             listaUsuariosMiSala.push(u); //lo agrego en la lista de mi sala
+            // cantConectadosEnMiSala++;
         }
         
         let liConectado= document.createElement("li");
@@ -109,10 +111,10 @@ socket.on("pedirConectados", (data)=>{
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////SALAS////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //VARIABLES     //Salas
 let btnCrearSala= document.getElementById("btn-crear-sala");
 let btnUnirse= document.getElementsByClassName("btn-unirse");
@@ -129,7 +131,8 @@ let nombreSala="";
 let btnSalirDeSala= document.getElementById("btn-salir-sala");
 let tituloDeSala = document.getElementById("titulo-sala");
 let divSalaSeleccionada = document.getElementById("sala-seleccionada");
-
+let cantConectadosEnMiSala=0;
+let abandonador="ALGUIEN" //es la variable para guardar quien se desconecto
 
 //LISTENERS
 btnCrearSala.addEventListener("click",mostrarCrearSala);
@@ -240,6 +243,17 @@ function eventoUnirseSala(e){
         socket.emit("actualizarMiSala",nombreSala);
         divSalaSeleccionada.style.display="flex";
         
+        //PREPARO EL AVISO A LOS DEMAS PARTICIPANTES        
+        setTimeout(() => {
+            let tiempo=new Date();
+            let datos={
+                listaReceptores:listaUsuariosMiSala,
+                usuario:datosUsuario.nombreUsuario,
+                mensaje:"SE HA UNIDO A ESTA SALA",
+                hora:tiempo.getHours()+":"+tiempo.getMinutes()
+            }
+            socket.emit("enviarMensaje",datos); 
+        }, TIMEOUTESPERA+1000);
     }else{
         window.alert("Usted ya se encuentra en una sala");
     }
@@ -254,41 +268,7 @@ function salirDeSala(){
         
         divSalaSeleccionada.style.display="none"; //mantengo oculta la sala
         socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
-        
     }
-}
-
-function cargarDatosDeLaSala(nombreDeSala){
-    // tituloDeSala.innerText="Conectado a: "+nombreDeSala;
-    // //listaUsuariosMiSala  -> esta variable la cargo con los usuarios q estan en mi sala al traer a los conectados
-    // let datosSala= listaSalas.find(listaSalas => listaSalas.nombreSala== nombreDeSala)//busco los datos de esta sala para obtener el admin
-    // let adminSala= datosSala.adminSala;
-
-    // let ulConectadosSala= document.getElementById("ul-conectados-sala");
-    // while(ulConectadosSala.firstChild){
-    //     ulConectadosSala.removeChild(ulConectadosSala.firstChild);
-    // }
-
-    // listaUsuariosMiSala.forEach( (u)=>{
-
-    //     let liConectadoSala= document.createElement("li");
-    //     liConectadoSala.id="li-conectados-sala";
-
-    //     let pNombre= document.createElement("p");
-    //     pNombre.innerText=u.nombreUsuario;
-    //     if(u.nombreUsuario==adminSala){
-    //         pNombre.innerText+=" (ADMIN)";
-    //     }
-
-    //     let pPuntaje = document.createElement("p");
-    //     pPuntaje.innerText=u.puntajeUsuario;
-
-    //     liConectadoSala.appendChild(pNombre);
-    //     liConectadoSala.appendChild(pPuntaje);
-
-    //     ulConectadosSala.appendChild(liConectadoSala);
-    // })
-
 }
 
 function mostrarSalaSeleccionada(){ divSalaSeleccionada.style.display="flex";}
@@ -347,6 +327,18 @@ socket.on("pedirSalas",(data)=>{
                 ulConectadosSala.removeChild(ulConectadosSala.firstChild);
             }
 
+            // console.log(cantConectadosEnMiSala);
+            if(listaUsuariosMiSala.length < cantConectadosEnMiSala){ //si disminuyen conectados mando el mensaje
+                // setTimeout(() => {
+                    let tiempo=new Date();
+                    liMensaje= crearLiMensaje(abandonador,"HA ABANDONADO ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
+                    liMensaje.classList.add("abandonado-la-sala");
+                    ulMensajes.appendChild(liMensaje);
+                    abandonador="nulo";
+                // }, TIMEOUTESPERA+500);
+            }
+            cantConectadosEnMiSala=listaUsuariosMiSala.length;
+
             listaUsuariosMiSala.forEach( (u)=>{
 
                 let liConectadoSala= document.createElement("li");
@@ -365,16 +357,161 @@ socket.on("pedirSalas",(data)=>{
                 liConectadoSala.appendChild(pPuntaje);
 
                 ulConectadosSala.appendChild(liConectadoSala);
+
             })
         },TIMEOUTESPERA);
+    })
+
+    let contador=0;
+    socket.on("elAbandonadorEs", (escrache)=>{
+        abandonador=escrache;
+
+        // console.log(cantConectadosEnMiSala);
+        // let tiempo=new Date();
+        // liMensaje= crearLiMensaje(abandonador,"HA ABANDONADO ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
+        // liMensaje.classList.add("abandonado-la-sala");
+        // ulMensajes.appendChild(liMensaje);
+        // abandonador="nulo";
+
+        // contador++;
+        // console.log("otravez");
+        // console.log(contador);
     })
 })
 
 
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+/////////////////////////////////////////////////CHATS////////////////////////////////////////////////
+
+//VARIABLES     //CHATS
+let pEstado= document.getElementById("p-estado");//coloco quien esta escribiendo
+let inputMensaje= document.getElementById("input-mensaje");
+let btnEnviarMensaje= document.getElementById("btn-enviar-mensaje");
+let ulMensajes= document.getElementById("ul-mensajes");
+let liMensaje;
+let mensaje="vacio"; //mensaje que escribe el usuario
+let misEscritores= new Array();
+
+///EVENT LISTENERS
+btnEnviarMensaje.addEventListener("click",enviarMensaje);
+inputMensaje.addEventListener("keyup",eventoTeclaInputMensaje);
+
+
+
+//FUNCIONES CHATS
+function enviarMensaje(e){
+    mensaje= inputMensaje.value;
+    
+    if(mensaje=="" || mensaje==null || mensaje.trim()==""){
+        return; //no envia el mensaje;
+    }
+
+    let tiempo=new Date();
+    let datos={
+        listaReceptores:listaUsuariosMiSala,
+        usuario:datosUsuario.nombreUsuario,
+        mensaje:mensaje,
+        hora:tiempo.getHours()+":"+tiempo.getMinutes()
+    }
+    socket.emit("enviarMensaje",datos);    //emito el mensajes a los demas
+    inputMensaje.value="";
+    inputMensaje.focus();
+}
+
+function eventoTeclaInputMensaje(e){
+    if(e.keyCode==13){  //quiere decir que la tecla era el enter
+        enviarMensaje(e);
+        //TAMBIEN TENGO QUE QUITAR AL ESCRITOR DE LA LISTA
+        return;
+    }
+
+    //caso contratrio aviso quien esta escribiendo
+    console.log(misEscritores.find(misEscritores => datosUsuario.nombreUsuario));
+    if(misEscritores.find(misEscritores => datosUsuario.nombreUsuario)!==datosUsuario.nombreUsuario){ //si no estoy en la lista de escritores
+        misEscritores.push(datosUsuario.nombreUsuario);
+    }
+        
+    let datos={
+        listaReceptores:listaUsuariosMiSala,
+        escritores: misEscritores
+    }
+    socket.emit("escribiendo",datos);
+
+}
+
+function crearLiMensaje(usuario,mensaje,hora){
+    let liMensaje= document.createElement("li");
+    liMensaje.classList.add("li-mensajes");
+
+    let pUsuario= document.createElement("p");
+    pUsuario.innerText= usuario;
+
+    let pMensaje= document.createElement("p");
+    pMensaje.innerText= mensaje;
+
+    let pHora= document.createElement("p");
+    pHora.innerText= hora;
+
+    liMensaje.appendChild(pUsuario);
+    liMensaje.appendChild(pMensaje);
+    liMensaje.appendChild(pHora);
+
+    return liMensaje;
+}
+
+///SOCKETS CHATS
+socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por id de socket
+    // datos=> contiene el usuario, el mensaje y la hora
+    let liMensaje= crearLiMensaje(datos.usuario,datos.mensaje,datos.hora);
+    if(datosUsuario.nombreUsuario == datos.usuario){//si mi nombre es el mismo que el que envio
+        liMensaje.classList.add("mensaje-mio");
+    }else{
+        liMensaje.classList.add("mensaje-otro");
+    }
+
+    if(datos.mensaje== "SE HA UNIDO A ESTA SALA"){
+        liMensaje.classList.add("se-a-unido-a-sala");
+    }else if(datos.mensaje=="HA ABANDONADO LA SALA"){
+        liMensaje.classList.add("abandonado-la-sala");
+    }
+
+    ulMensajes.appendChild(liMensaje);
+})
+
+socket.on("escribiendo", (escritores)=>{
+    misEscritores=escritores;
+    
+    let miPosicion=escritores.indexOf(datosUsuario.nombreUsuario);//busco mi indice
+    if(miPosicion !== -1){ //es decir, si estoy en el array
+        escritores.splice(miPosicion,1);//me elimino del array
+    }
+
+    let estadoEscribiendo= document.getElementById("p-estado");
+    let cantEscritores= escritores.length;
+    console.log(escritores);
+
+    if(cantEscritores ==0){
+        estadoEscribiendo.innerText="Nadie escribe";
+    }else if(cantEscritores ==1){
+        estadoEscribiendo.innerText= escritores[0]+ " esta escribiendo";
+    }else if(cantEscritores ==2){
+        estadoEscribiendo.innerText= escritores[0]+" y "+escritores[1]+" estan escribiendo";
+    }else if(cantEscritores >2){
+        estadoEscribiendo.innerText= escritores[0]+", "+escritores[1]+" y "+(cantEscritores-2)+" más estan escribiendo";
+    }
+})
 
 
 ///DEBUGEANDO
 socket.on("ver", (datos)=>{
+    // let miLi= document.createElement("li");
+    // miLi=datos.li;
+    // console.log(miLi);
     console.log(datos);
 })
 

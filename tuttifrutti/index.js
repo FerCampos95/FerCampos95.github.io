@@ -62,21 +62,25 @@ io.on("connection", (socket)=>{
         io.emit("pedirSalas",listaSalas);
         io.emit("pedirConectados",listaConectados);
     })
-
+    
     socket.on("disconnect",()=>{
+        let abandonador="nula";
         console.log("Se desconecto: "+socket.id);
         listaConectados.forEach( (usuario, index)=>{
             if(usuario.idUsuario == socket.id){
                 if(usuario.nombreSala !== "Ninguna-Sala"){//es decir, el usuario estaba en una sala
                     quitarloDeSala(usuario.nombreUsuario,usuario.nombreSala); //lo quito de la sala
                     io.emit("actualizarMiSala",usuario.nombreSala);
+                    abandonador=usuario.nombreUsuario;
                 }
                 listaConectados.splice(index,1);
             }
         })
-
+        
         io.emit("pedirConectados",listaConectados);
         io.emit("pedirSalas",listaSalas);
+        io.emit("elAbandonadorEs",abandonador);
+        
     })
 
     ////FUNCIONES PARA SALAS
@@ -139,8 +143,28 @@ io.on("connection", (socket)=>{
     }
     
     
+    ///////FUNCIONES PARA CHAT
+    socket.on("enviarMensaje", (info)=>{ //datos es, listarecemptores,usuario,mensaje,hora
+        info.listaReceptores.forEach( (receptor)=>{//recorro los receptores
+            let datosMensaje={
+                usuario:info.usuario,
+                mensaje:info.mensaje,
+                hora:info.hora
+            }
+            io.to(receptor.idUsuario).emit("recibirMensaje", datosMensaje);
+        })
+    })
+
+    socket.on("escribiendo", (datos)=>{
+        datos.listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("escribiendo", datos.escritores);
+        })
+    })
     
-    //io.emit("ver",datos); //este es para ver los datos desde la consola del navegador
+    
+    
+    
 })
 
+// io.emit("ver",datosMensaje); //este es para ver los datos desde la consola del navegador
 
