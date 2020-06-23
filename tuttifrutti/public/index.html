@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximun-scale=1.0, minimun-scale=1.0">
     <link rel="stylesheet" href="main.css">
 </head>
-<body>
+<body id="body">
     <div id="padre">
         <h1>Bienvenido al TuttiFrutti</h1>
 
@@ -27,11 +27,13 @@
             <div id="usuarios">
                 <h2>Usuarios conectados</h2>
                 <li>
-                    <p>----Usuario----</p>
-                    <p>----------En la Sala----------</p>
+                    <!-- <p>----Usuario----</p>
+                    <p>----------En la Sala----------</p> -->
+                    <p style="flex:1 2 auto">Usuario</p>
+                    <p style="flex:1 1 auto;">En la Sala</p>
                 </li>
                 <ul id="ul-conectados">
-                    <li id="li-conectados">
+                    <li id="li-conectados" class="li-conectados">
                         <p>nombre usuario</p>
                         <p>sala en la que esta</p>
                     </li>
@@ -40,8 +42,8 @@
             <div id="salas" >
                 <h2>Salas</h2>
                 <li>
-                    <p>-------Nombre de la sala-------</p>
-                    <p>-N° Conectados-</p>
+                    <p style="flex: 20 1 auto;">Nombre de la sala</p>
+                    <p style="flex: 1 1 auto;">N° Conectados</p>
                 </li>
                 <ul id="ul-salas">
                     <li id="li-salas">
@@ -65,6 +67,10 @@
             </div>
             <div id="conectados-sala">
                 <h2>Usuarios conectados en esta Sala</h2>
+                <li>
+                    <p style="flex: 20 1 auto;">Usuario</p>
+                    <p style="flex: 1 1 auto;">Puntaje</p>
+                </li>
                 <ul id="ul-conectados-sala">
                     <li id="li-conectados-sala">
                         <p>nombre usuario</p>
@@ -110,14 +116,34 @@
                                 <p class="msj">Este es un mensaje</p>
                                 <p class="hora">10:25</p>
                             </li>
-                            <li id="li-mensajes" class="li-mensajes ">
+                            <li id="li-mensajes" class="li-mensajes abandonado-la-sala">
                                 <p class="usr">Usuario</p>
                                 <p class="msj">Este es otro mensaje</p>
                                 <p class="hora">10:25</p>
                             </li>
+                            <li id="li-mensajes" class="li-mensajes ">
+                                <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje</p>
+                                <p class="hora">10:25</p>
+                            </li>
                             <li id="li-mensajes" class="li-mensajes mensaje-mio">
                                 <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje</p>
+                                <p class="hora">10:25</p>
+                            </li>
+                            <li id="li-mensajes" class="li-mensajes mensaje-mio se-a-unido-a-sala">
+                                <p class="usr">Fernando</p>
                                 <p class="msj">Este es un mensaje mio</p>
+                                <p class="hora">10:25</p>
+                            </li>
+                            <li id="li-mensajes" class="li-mensajes ">
+                                <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje</p>
+                                <p class="hora">10:25</p>
+                            </li>
+                            <li id="li-mensajes" class="li-mensajes ">
+                                <p class="usr">Fernando</p>
+                                <p class="msj">Este es un mensaje</p>
                                 <p class="hora">10:25</p>
                             </li>
                         </ul>

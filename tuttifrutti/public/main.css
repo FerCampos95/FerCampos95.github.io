@@ -16,6 +16,7 @@
         align-items: center;
         margin: 0px 20% 0px 20%;
         padding: 30px;
+        margin-bottom: 30px;
     }
 
     #info{ /*CONTIENE LAS SALAS Y LOS USUARIOS*/
@@ -31,8 +32,11 @@
             flex: 1 1 auto;
             margin-right: 15px;
             padding: 15px;
+        }
+        .li-conectados{
 
         }
+
         #salas{
             background-color: red;
             /* display: flex; */
@@ -97,8 +101,7 @@
                 flex-direction: column;
                 flex-wrap: nowrap;
                 margin-left: 10px;
-                height: 500px;
-                
+                height: 440px;
                 /* text-align: center; */
             }
                 #mensajes{
@@ -109,7 +112,7 @@
                 }
                 .ul-mensajes{
                     display: flex;
-                    margin-left: -10px;
+                    margin-left: 10px;
                 }
                 .li-mensajes{
                     display: flex;
@@ -123,7 +126,7 @@
                 }
                 .usr{
                     background-color: violet;
-                    max-width: 135px; /*entran 15 caracteres*/
+                    max-width: 160px; /*entran 12 caracteres*/
                     font-weight: bold;
                     font-style: italic;
                     text-decoration-line: underline;
@@ -136,13 +139,32 @@
                     flex-direction: row-reverse;
                 }
                 .se-a-unido-a-sala{
-
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: green;
+                    min-height: 25px;
+                    max-height: 40px;
+                    margin: -10px 70px 15px 70px;
+                    border-radius: 5%;
+                    border: solid black 1px;
+                    padding: 0px 3px 0px 3px;
                 }
                 .abandonado-la-sala{
-                    
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: red;
+                    min-height: 25px;
+                    max-height: 40px;
+                    margin: -10px 70px 15px 70px;
+                    border-radius: 5%;
+                    border: solid black 1px;
+                    padding: 0px 3px 0px 3px;
                 }
                 #p-estado{
                     margin-top: 3px;
+                    margin-bottom: 3px;
                     background-color: cadetblue;
                 }
                 #barra-mensaje{
@@ -173,14 +195,84 @@
 ul{
     display: flex;
     flex-direction: column;
+    padding: 0px;
+    margin: 0px;
 }
 li{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0px;
+    margin: 0px;
 }
 
 /* #modal-crear-sala{
 	
 } */
 
+@media screen and (max-width: 900px){
+    #login{
+        margin: 0px 20px 0px 20px;
+    }
+
+    #info{
+        flex-direction: column;
+        margin: 20px;
+    }
+        #usuarios{
+            margin: 0px 0px 20px 0px;
+        }
+        #salas{
+            margin: 0px 0px 20px 0px;
+        }
+        #modal-crear-sala{
+            margin: 0px 0px 20px 0px;
+        }
+        #conectados-sala{
+            margin: 0px 0px 20px 0px;
+        }
+    
+    #sala-seleccionada{
+        flex-direction: column;
+    }
+        #juego{
+            max-width: 100%;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+        }
+        #info-y-chat{
+            max-width: 100%;
+        }
+            #info-y-chat h2{
+                margin: 4px;
+            }
+            #chat-sala{
+                margin: 0px;
+                height: 300px;
+            }
+                #mensajes{
+                }
+                .ul-mensajes{
+
+                }
+                .li-mensajes{
+
+                }
+                /* clases dentro del li */
+                .se-a-unido-a-sala{
+                    margin: -10px 8px 15px 2px;
+                }
+                .abandonado-la-sala{
+                    margin: -10px 8px 15px 2px;
+                }
+                #p-estado{
+
+                }
+                #barra-mensaje{
+                    height: 10%;
+                }
+                #input-mensaje{
+
+                }
+
+}

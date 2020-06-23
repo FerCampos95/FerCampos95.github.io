@@ -33,12 +33,19 @@ function validarUsuario(e){
     usuario= inputUsuario.value;
 
     labelCaracteres.innerText=usuario.length + "-";
-    if(usuario.length > 15 || usuario=="" || usuario==null || usuario==undefined || usuario.trim()==""){
-        requisitosUsuario.innerText="Error, el nombre de usuario debe tener entre 1 y 15 Caracteres";
+
+    if(inputUsuario.value.split(" ").length>1){
+        requisitosUsuario.innerText="Error, el nombre de usuario no puede tener espacios";
+        inputUsuario.style.color="red";
+        return false;
+    }
+
+    if(usuario.length > 12 || usuario=="" || usuario==null || usuario==undefined || usuario.trim()==""){
+        requisitosUsuario.innerText="Error, el nombre de usuario debe tener entre 1 y 12 Caracteres";
         inputUsuario.style.color="red";
         return false;
     }else{
-        requisitosUsuario.innerText="Ingrese su nombre de Usuario (1-15 Caracteres)";
+        requisitosUsuario.innerText="Ingrese su nombre de Usuario (1-12 Caracteres)";
         inputUsuario.style.color="green";
     }
 
@@ -91,6 +98,7 @@ socket.on("pedirConectados", (data)=>{
         }
         
         let liConectado= document.createElement("li");
+        liConectado.className="li-conectados";
         liConectado.id="li-conectados";
 
         let pNombre= document.createElement("p");
@@ -241,7 +249,9 @@ function eventoUnirseSala(e){
         datosUsuario.salaUsuario=nombreSala;
         socket.emit("conectarseASala",nombreSala);
         socket.emit("actualizarMiSala",nombreSala);
-        divSalaSeleccionada.style.display="flex";
+        mostrarSalaSeleccionada();
+        window.scroll(0,document.body.scrollHeight);//hace scroll hasta abajo de todo
+        
         
         //PREPARO EL AVISO A LOS DEMAS PARTICIPANTES        
         setTimeout(() => {
@@ -249,7 +259,7 @@ function eventoUnirseSala(e){
             let datos={
                 listaReceptores:listaUsuariosMiSala,
                 usuario:datosUsuario.nombreUsuario,
-                mensaje:"SE HA UNIDO A ESTA SALA",
+                mensaje:"SE UNIÓ A ESTA SALA",
                 hora:tiempo.getHours()+":"+tiempo.getMinutes()
             }
             socket.emit("enviarMensaje",datos); 
@@ -288,6 +298,7 @@ socket.on("pedirSalas",(data)=>{
     listaSalas.forEach( (sala)=>{
         let liSala= document.createElement("li");
         liSala.id="li-salas";
+        liSala.className="li-salas";
 
         let btnUnirse= document.createElement("button");
         btnUnirse.className="btn-unirse";
@@ -331,9 +342,11 @@ socket.on("pedirSalas",(data)=>{
             if(listaUsuariosMiSala.length < cantConectadosEnMiSala){ //si disminuyen conectados mando el mensaje
                 // setTimeout(() => {
                     let tiempo=new Date();
-                    liMensaje= crearLiMensaje(abandonador,"HA ABANDONADO ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
+                    liMensaje= crearLiMensaje(abandonador,"ABANDONÓ ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
                     liMensaje.classList.add("abandonado-la-sala");
                     ulMensajes.appendChild(liMensaje);
+                    let divMensajes= document.getElementById("mensajes");
+                    divMensajes.scrollTop= divMensajes.scrollHeight;
                     abandonador="nulo";
                 // }, TIMEOUTESPERA+500);
             }
@@ -343,6 +356,7 @@ socket.on("pedirSalas",(data)=>{
 
                 let liConectadoSala= document.createElement("li");
                 liConectadoSala.id="li-conectados-sala";
+                liConectadoSala.className="li-conectados-sala";
 
                 let pNombre= document.createElement("p");
                 pNombre.innerText=u.nombreUsuario;
@@ -365,17 +379,6 @@ socket.on("pedirSalas",(data)=>{
     let contador=0;
     socket.on("elAbandonadorEs", (escrache)=>{
         abandonador=escrache;
-
-        // console.log(cantConectadosEnMiSala);
-        // let tiempo=new Date();
-        // liMensaje= crearLiMensaje(abandonador,"HA ABANDONADO ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
-        // liMensaje.classList.add("abandonado-la-sala");
-        // ulMensajes.appendChild(liMensaje);
-        // abandonador="nulo";
-
-        // contador++;
-        // console.log("otravez");
-        // console.log(contador);
     })
 })
 
@@ -492,9 +495,9 @@ socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por 
         // liMensaje.classList.add("mensaje-otro");
     }
 
-    if(datos.mensaje== "SE HA UNIDO A ESTA SALA"){
+    if(datos.mensaje== "SE UNIÓ A ESTA SALA"){
         liMensaje.classList.add("se-a-unido-a-sala");
-    }else if(datos.mensaje=="HA ABANDONADO LA SALA"){
+    }else if(datos.mensaje=="ABANDONÓ LA SALA"){
         liMensaje.classList.add("abandonado-la-sala");
     }
 
@@ -529,9 +532,6 @@ socket.on("escribiendo", (escritores)=>{
 
 ///DEBUGEANDO
 socket.on("ver", (datos)=>{
-    // let miLi= document.createElement("li");
-    // miLi=datos.li;
-    // console.log(miLi);
     console.log(datos);
 })
 
@@ -539,5 +539,6 @@ socket.on("ver", (datos)=>{
 //EJECUCIONES INICIALES - LLAMADOS AUTOMATICOS
 socket.emit("pedirConectados");
 socket.emit("pedirSalas");
+inputUsuario.focus();
 ocultarUsuariosYSalas();
 ocultarSalaSeleccionada();
