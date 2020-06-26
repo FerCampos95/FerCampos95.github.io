@@ -1,5 +1,6 @@
 const socket= io();
 const TIMEOUTESPERA=1000;
+const TIEMPOESPERALANZAMIENTOJUEGO=6000;
 
 let datosUsuario={
     nombreUsuario:"",
@@ -530,6 +531,277 @@ socket.on("escribiendo", (escritores)=>{
 })
 
 
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//////////////////////////JUEGO///////////////////////////////////////////////////////////////////////
+//variables juego
+let btnEditarCategorias= document.getElementById("editar-categorias-juego");
+let btnAgregarCategiria= document.getElementById("agregar-categorias-juego");
+let ulCategorias= document.getElementById("ul-categoria");
+let listaCategorias=["Nombres","Colores","Cosas","Frutas/Verduras","Paises/Provincias","Peliculas/Series","Famosos","Animales"];
+let btnIniciarCancelar= document.getElementById("btn-iniciar-cancelar");
+let cantUsuariosPreparados= 0;
+let gifContador= document.getElementById("contador-tiempo");
+let juegoIniciado=true;
+let btnBastaParaTodos= document.getElementById("btn-basta-para-todos");
+
+
+
+//EVENT LISTENERS JUEGO
+btnEditarCategorias.addEventListener("click",iniciar_finalizar_EdicionCategorias);
+btnAgregarCategiria.addEventListener("click",agregarCategoria);
+btnIniciarCancelar.addEventListener("click",iniciar_cancelar);///manda la señal que el jugador esta preparado
+btnBastaParaTodos.addEventListener("click",(e)=>{
+    cargarJugadoresPreparados();
+    console.log("preparados :"+cantUsuariosPreparados);
+    console.log("conectados :"+cantConectadosEnMiSala);
+})
+
+//FUNCIONES JUEGO
+function iniciar_finalizar_EdicionCategorias(e){
+    e.preventDefault();
+    let soyAdmin=false;
+    listaSalas.forEach( (sala,index)=>{//recorro las salas
+        if(sala.nombreSala== datosUsuario.salaUsuario){//si es mi sala
+            if(sala.adminSala==datosUsuario.nombreUsuario){
+                soyAdmin=true;
+            }
+        }
+    })
+    if(soyAdmin){
+        if(btnEditarCategorias.value=="Editar Categorias"){
+            mostrarBotonesEdicion();
+            btnEditarCategorias.value="Finalizar Edicion";
+            btnEditarCategorias.innerText="Finalizar Edicion";
+            btnAgregarCategiria.classList.remove("oculto");
+        }else{
+            ocultarBotonesEdicion();
+            btnEditarCategorias.value="Editar Categorias";
+            btnEditarCategorias.innerText="Editar Categorias";
+            btnAgregarCategiria.classList.add("oculto");
+        }
+    }else{
+        window.alert("Solo puede editar el administrador de la sala");
+    }
+}
+function ocultarBotonesEdicion(){
+    visibilidadBotones(document.getElementsByClassName("btn-subir-categoria"),false);
+    visibilidadBotones(document.getElementsByClassName("btn-bajar-categoria"),false);
+    visibilidadBotones(document.getElementsByClassName("btn-editar-categoria"),false);
+    visibilidadBotones(document.getElementsByClassName("btn-quitar-categoria"),false);
+}
+function mostrarBotonesEdicion(){
+    visibilidadBotones(document.getElementsByClassName("btn-subir-categoria"),true);
+    visibilidadBotones(document.getElementsByClassName("btn-bajar-categoria"),true);
+    visibilidadBotones(document.getElementsByClassName("btn-editar-categoria"),true);
+    visibilidadBotones(document.getElementsByClassName("btn-quitar-categoria"),true);
+}
+function visibilidadBotones(btns,mostrar){
+    if(mostrar){
+        for(let i=0; i<btns.length;i++){
+            btns[i].classList.remove("oculto");
+        }
+    }else{
+        for(let i=0; i<btns.length;i++){
+            btns[i].classList.add("oculto");
+        }
+    }
+}
+function agregarCategoria(e){
+    let nuevaCategoria=window.prompt("Ingrese el nombre para la nueva categoria: ");
+    if(nuevaCategoria!==null || nuevaCategoria.trim()!==""){
+        listaCategorias.push(nuevaCategoria);
+        crearLosLICategoria(listaCategorias);//vuelvo a crear los LI
+    }else{
+        // window.alert("Categoria No Valida");
+    }
+}
+function accionBotonEdiciones(e){
+    e.preventDefault();
+    if(e.target.localName== "button"){
+        let clase= e.target.className;//agarro la clase    
+        
+        let id=e.path[1].childNodes[0].id;//con esto agarro "cat-#"  #->es la posicion en la lista de categorias
+        let posicion= parseInt(id.substring(id.length-1));
+
+        switch(clase){//veo que boton presiona y llamo a esa accion
+            case "btn-subir-categoria" : subirPosicionCategoria(posicion);break;
+            case "btn-bajar-categoria" : bajarPosicionCategoria(posicion);break;
+            case "btn-editar-categoria": editarPosicionCategoria(posicion);break;
+            case "btn-quitar-categoria": quitarPosicionCategoria(posicion);break;
+        }
+    }//si no es boton no hago nada
+}
+function bajarPosicionCategoria(posicion){//aumentar su posicion en el array
+    let nombreCategoria= listaCategorias[posicion];//me guardo el nombre de la categoria
+    let posicionTope= listaCategorias.length;
+    listaCategorias.splice(posicion,1);//elimino el elemento
+    posicion++;//al aumentarle queda mas atras del array y se general el label mas tarde(queda +abajo)
+    if(posicion==posicionTope)
+        posicion=0;
+    listaCategorias.splice(posicion,0,nombreCategoria);//la inserto en la nueva posicion
+    crearLosLICategoria(listaCategorias);//vuelvo a crear los LI
+}
+function subirPosicionCategoria(posicion){ //disminuir su posicion en el array
+    let nombreCategoria= listaCategorias[posicion];//conservo el nombre de la cat
+    let posicionTope= listaCategorias.length-1;
+    listaCategorias.splice(posicion,1);//elimino el elemento
+    posicion--;
+    if(posicion==-1)
+        posicion=posicionTope;
+        // return;    
+    listaCategorias.splice(posicion,0,nombreCategoria);//la inserto en la nueva posicion
+    crearLosLICategoria(listaCategorias);//vuelvo a crear los LI
+}
+function editarPosicionCategoria(posicion){
+    // let nombreCategoria= listaCategorias[posicion];
+    let nuevaCategoria=window.prompt("Ingrese el reemplazo para la categoria: "+listaCategorias[posicion]);
+    if(nuevaCategoria!==null || nuevaCategoria.trim()!==""){
+        listaCategorias.splice(posicion,1,nuevaCategoria);
+        crearLosLICategoria(listaCategorias);//vuelvo a crear los LI
+    }else{
+        // window.alert("Categoria No Valida");
+    }
+}
+function quitarPosicionCategoria(posicion){
+    listaCategorias.splice(posicion,1);
+    crearLosLICategoria(listaCategorias);//vuelvo a crear los LI
+}
+
+function crearLosLICategoria(categorias){
+    //limpio el ul
+    while(ulCategorias.firstChild){
+        ulCategorias.removeChild(ulCategorias.firstChild);
+    }
+    
+    let liCategoria;
+    categorias.forEach( (cat,index)=>{
+        liCategoria= document.createElement("li");
+
+        liCategoria.id="li-categoria";
+        liCategoria.className="li-categoria";
+
+        let labelCategoria= document.createElement("label");
+        labelCategoria.innerText=cat;
+        labelCategoria.id="cat-"+index;
+        labelCategoria.className="label-categoria";
+
+        let inputCategoria= document.createElement("input");
+        inputCategoria.type="text";
+        inputCategoria.id="input-"+index;
+        inputCategoria.addEventListener("keydown", (e)=>{
+            if(e.keyCode==13){
+                if(document.getElementById("input-"+(index+1))){
+                    document.getElementById("input-"+(index+1)).focus();
+                }else{
+                    document.getElementById("input-"+0).focus();
+                }
+            }
+        })
+
+        let btnSubir =document.createElement("button");
+        btnSubir.innerText="Subir";
+        btnSubir.classList.add("btn-subir-categoria");
+        // btnSubir.classList.add("oculto");
+
+        let btnBajar =document.createElement("button");
+        btnBajar.innerText="Bajar";
+        btnBajar.classList.add("btn-bajar-categoria");
+        // btnBajar.classList.add("oculto");
+        
+        let btnEditar =document.createElement("button");
+        btnEditar.innerText="Editar";
+        btnEditar.classList.add("btn-editar-categoria");
+        // btnEditar.classList.add("oculto");
+        
+        let btnQuitar =document.createElement("button");
+        btnQuitar.innerText="Quitar";
+        btnQuitar.classList.add("btn-quitar-categoria");
+        // btnQuitar.classList.add("oculto");
+
+        liCategoria.appendChild(labelCategoria);
+        liCategoria.appendChild(inputCategoria);
+        liCategoria.appendChild(btnSubir);
+        liCategoria.appendChild(btnBajar);
+        liCategoria.appendChild(btnEditar);
+        liCategoria.appendChild(btnQuitar);
+
+        liCategoria.addEventListener("click",accionBotonEdiciones);
+        ulCategorias.appendChild(liCategoria);
+    })
+}
+
+function iniciar_cancelar(e){
+    if(btnIniciarCancelar.value=="iniciar"){
+        // console.log("preparados :"+cantUsuariosPreparados);
+        // console.log("conectados :"+cantConectadosEnMiSala);
+        socket.emit("juego:yaIniciaron?",listaUsuariosMiSala);
+        
+        setTimeout( ()=>{
+            if(juegoIniciado){
+                window.alert("El juego ya inicio espere un momento por favor");
+                return;
+            }
+            console.log(listaUsuariosMiSala);
+            let info={
+                listaReceptores:listaUsuariosMiSala,
+                nombrePreparado:datosUsuario.nombreUsuario
+            }
+            
+            cargarJugadoresPreparados();
+            socket.emit("juego:estoyListo",info);//mando a quienes le envio y mi nombre
+            btnIniciarCancelar.value="cancelar";
+            btnIniciarCancelar.innerText="Cancelar";
+        },500);
+    }
+}
+function cargarJugadoresPreparados(){
+    cantUsuariosPreparados=0;
+    listaUsuariosMiSala.forEach( (jugador)=>{
+        if(jugador.preparadoUsuario==true){
+            cantUsuariosPreparados++;
+        }
+    })
+}
+
+function lanzarElJuego(){
+    console.log("juego iniciado");
+    socket.emit("juego:iniciado",listaUsuariosMiSala);//cambia el estado de los conectados a jugando
+
+    ulCategorias.classList.add("oculto");
+    gifContador.classList.remove("oculto");
+    setTimeout(()=>{
+        ulCategorias.classList.remove("oculto");
+        gifContador.classList.add("oculto");
+        btnIniciarCancelar.classList.add("oculto");
+        // juegoIniciado=true;
+    },TIEMPOESPERALANZAMIENTOJUEGO);
+}
+
+//ESCUCHAS DEL SOCKET
+socket.on("juego:usuarioPreparado", (nombre)=>{
+    listaUsuariosMiSala.forEach( (usuario)=>{
+        if(usuario.nombreUsuario==nombre){
+            usuario.preparadoUsuario=true;
+            cantUsuariosPreparados++;
+        }
+    })
+
+    if(cantUsuariosPreparados==cantConectadosEnMiSala){
+        lanzarElJuego();
+    }
+})
+socket.on("juego:yaIniciaron?", (respuesta)=>{
+    juegoIniciado=respuesta;
+})
+
+
+
 ///DEBUGEANDO
 socket.on("ver", (datos)=>{
     console.log(datos);
@@ -542,3 +814,6 @@ socket.emit("pedirSalas");
 inputUsuario.focus();
 ocultarUsuariosYSalas();
 ocultarSalaSeleccionada();
+
+crearLosLICategoria(listaCategorias);
+ocultarBotonesEdicion();

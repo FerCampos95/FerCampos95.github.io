@@ -90,20 +90,61 @@
             
 
             <div id="juego">
-                <h2>Letra: "L"</h2>
-                <ul id="ul-categoria">
-                    <li id="li-categoria">
-                        <label id="label-categoria">Nombres:
-                            <input id="cat-2" type="text">
-                        </label>
-                    </li>
-                    <li id="li-categoria">
-                        <label id="label-categoria">Frutas/Verduras
+                <div id="header-juego">
+                    <h2>Letra: "L"</h2>
+                    <button id="editar-categorias-juego" value="Editar Categorias">Editar Categorias</button>
+                    <button id="agregar-categorias-juego" class="oculto" value="Agregar Categoria">Agregar Categoria</button>
+                </div>
+                <div id="formulario">
+                    <img id="contador-tiempo" class="oculto" src="./images/tiempo6.gif" alt="contador de arranque">
+                    <ul id="ul-categoria">
+                        <!-- <li id="li-categoria" class="li-categoria">
+                            <label id="label-categoria">Nombres:</label>
                             <input id="cat-1" type="text">
-                        </label>
-                    </li>
-                </ul>
-                <button>Basta para todos</button>
+                            <button class="btn-subir-categoria oculto">Subir</button>
+                            <button class="btn-bajar-categoria oculto">Bajar</button>
+                            <button class="btn-editar-categoria oculto">Editar</button>
+                            <button class="btn-quitar-categoria oculto">Quitar</button>
+                        </li>
+                        <li id="li-categoria" class="li-categoria">
+                            <label id="label-categoria">Frutas/Verduras:</label>
+                            <input id="cat-2" type="text">
+                            <button class="btn-subir-categoria">Subir</button>
+                            <button class="btn-bajar-categoria">Bajar</button>
+                            <button class="btn-editar-categoria">Editar</button>
+                            <button class="btn-quitar-categoria">Quitar</button>
+                        </li> -->
+                    </ul>
+                    <button id="btn-iniciar-cancelar" value="iniciar">Iniciar</button>
+                    <button id="btn-basta-para-todos">Basta para todos</button>
+                </div>
+                <div id="resultados">
+                    <table>
+                        <caption>Resultados</caption>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Categoria 1</th>
+                            <th>Categoria 2</th>
+                            <th>Categoria 3</th>
+                            <th>Puntos</th>
+                        </tr>
+                        <tr>
+                            <th>Usuario 1</th>
+                            <td>resultado 1</td>
+                            <td>resultado 2</td>
+                            <td>resultado 3</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <th>Usuario 2</th>
+                            <td>resultado a</td>
+                            <td>resultado b</td>
+                            <td>resultado c</td>
+                            <td>20</td>
+                        </tr>
+                    </table>
+                </div>
+
             </div>
             <div id="info-y-chat">
                 

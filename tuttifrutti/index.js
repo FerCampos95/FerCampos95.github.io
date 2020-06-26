@@ -2,8 +2,6 @@
 const path= require("path");
 const express= require("express");
 const SocketIO = require("socket.io");
-const { Socket } = require("dgram");
-// const { Socket } = require("dgram");
 const app =express();
 
 //configuracion del puerto
@@ -20,8 +18,8 @@ const server =app.listen(app.get("port"), ()=>{
 const io= SocketIO(server);
 
 //variables de servidor
-let listaConectados= new Array();
-let listaSalas= new Array(); 
+let listaConectados= new Array(); //nombreUsuario,idUsuario,nombreSala,puntaje
+let listaSalas= new Array(); //nombreSala,adminSalam,cantConectados,conectados
 
 //conexiones del servidor
 io.on("connection", (socket)=>{
@@ -33,7 +31,9 @@ io.on("connection", (socket)=>{
             nombreUsuario: usuario,
             idUsuario: socket.id,
             nombreSala: "Ninguna-Sala",
-            puntajeUsuario:0
+            puntajeUsuario:0,
+            preparadoUsuario:false,
+            jugandoUsuario:false
         }
         listaConectados.push(info);
         io.emit("pedirConectados",listaConectados);
@@ -106,7 +106,9 @@ io.on("connection", (socket)=>{
             if(u.idUsuario== socket.id){ //busco el que emitio el pedido
                 sala=u.nombreSala;     //guardo la sala en la que esta
                 u.nombreSala="Ninguna-Sala";//le quito la sala en la que esta
-                u.puntajeUsuario=0,
+                u.puntajeUsuario=0;
+                u.preparadoUsuario=false;
+                u.jugandoUsuario=false;
                 usuario=u.nombreUsuario; //guardo el nombre de usuario
             }
         })
@@ -161,7 +163,40 @@ io.on("connection", (socket)=>{
         })
     })
     
-    
+    //FUNCIONES PARA EL JUEGO
+    socket.on("juego:estoyListo",(datos)=>{//lista de receptores y nombre del preparado
+        listaConectados.forEach( (usuario)=>{
+            if(usuario.nombreUsuario== datos.nombrePreparado){
+                usuario.preparadoUsuario=true;
+            }
+        })
+        datos.listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("juego:usuarioPreparado", datos.nombrePreparado);
+        })
+    })
+    socket.on("juego:iniciado", (listaJugadores)=>{
+        listaJugadores.forEach( (jugador)=>{
+            listaConectados.forEach( (usuario)=>{
+                if(usuario.nombreUsuario==jugador.nombreUsuario){
+                    usuario.jugandoUsuario=true;
+                }
+            })
+        })
+    })
+    socket.on("juego:yaIniciaron?",(listaJugadores)=>{
+        let respuesta=false;
+
+        listaJugadores.forEach( (jugador)=>{
+            listaConectados.forEach( (usuario)=>{
+                if(usuario.nombreUsuario==jugador.nombreUsuario){
+                    if(usuario.jugandoUsuario)
+                        respuesta=true;
+                }
+            })
+        })
+
+        io.to(socket.id).emit("juego:yaIniciaron?", respuesta);
+    })
     
     
 })

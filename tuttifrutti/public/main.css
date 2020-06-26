@@ -179,6 +179,27 @@
                 #btn-enviar-mensaje{
                     background-color: darkorchid;
                 }
+.label-categoria{
+    width: 130px;
+    text-align: left;
+}
+
+caption{
+    background-color: brown;
+    font-weight: bold;
+    font-size: 150%;
+}
+table{
+    border-collapse: collapse; /*para unificar los bordes*/
+    background-color: honeydew;
+    color: black;
+}
+td,th{
+    border: 3px solid black;
+}
+th{
+    background-color: gray;
+}
 
 .oculto{
     display: none;
