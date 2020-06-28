@@ -162,6 +162,18 @@
                     border: solid black 1px;
                     padding: 0px 3px 0px 3px;
                 }
+                .detuvo-el-juego{
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: orangered;
+                    min-height: 25px;
+                    max-height: 40px;
+                    margin: -10px 70px 15px 70px;
+                    border-radius: 5%;
+                    border: solid black 1px;
+                    padding: 0px 3px 0px 3px;
+                }
                 #p-estado{
                     margin-top: 3px;
                     margin-bottom: 3px;

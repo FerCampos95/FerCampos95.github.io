@@ -146,7 +146,7 @@ io.on("connection", (socket)=>{
     
     
     ///////FUNCIONES PARA CHAT
-    socket.on("enviarMensaje", (info)=>{ //datos es, listarecemptores,usuario,mensaje,hora
+    socket.on("enviarMensaje", (info)=>{ //datos es: listarecemptores,usuario,mensaje,hora
         info.listaReceptores.forEach( (receptor)=>{//recorro los receptores
             let datosMensaje={
                 usuario:info.usuario,
@@ -167,18 +167,22 @@ io.on("connection", (socket)=>{
     socket.on("juego:estoyListo",(datos)=>{//lista de receptores y nombre del preparado
         listaConectados.forEach( (usuario)=>{
             if(usuario.nombreUsuario== datos.nombrePreparado){
-                usuario.preparadoUsuario=true;
+                usuario.preparadoUsuario=datos.preparado;
             }
         })
+        let info={
+            nombre:datos.nombrePreparado,
+            preparado:datos.preparado
+        }
         datos.listaReceptores.forEach( (receptor)=>{
-            io.to(receptor.idUsuario).emit("juego:usuarioPreparado", datos.nombrePreparado);
+            io.to(receptor.idUsuario).emit("juego:usuarioPreparado", info);
         })
     })
-    socket.on("juego:iniciado", (listaJugadores)=>{
-        listaJugadores.forEach( (jugador)=>{
+    socket.on("juego:iniciado", (datos)=>{//llega lista de receptores y true o false(juegan o no)
+        datos.receptores.forEach( (jugador)=>{
             listaConectados.forEach( (usuario)=>{
                 if(usuario.nombreUsuario==jugador.nombreUsuario){
-                    usuario.jugandoUsuario=true;
+                    usuario.jugandoUsuario=datos.jugando;//si llego true es xq juegan, sino false
                 }
             })
         })

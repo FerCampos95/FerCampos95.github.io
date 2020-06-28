@@ -320,69 +320,69 @@ socket.on("pedirSalas",(data)=>{
         liSala.addEventListener("click",eventoUnirseSala);
         ulSalas.appendChild(liSala);
     })
-
-    socket.on("actualizarMiSala", (miSala)=>{
-        setTimeout( ()=>{
-            tituloDeSala.innerText="Conectado a: "+miSala;
-            //listaUsuariosMiSala  -> esta variable la cargo con los usuarios q estan en mi sala al traer a los conectados
-            let datosSala= listaSalas.find(listaSalas => listaSalas.nombreSala== miSala)//busco los datos de esta sala para obtener el admin
-            let adminSala="";
-            
-            if(datosSala!==undefined){
-                adminSala= datosSala.adminSala;
-            }else{
-                adminSala= datosUsuario.nombreUsuario;
-            }
-
-            let ulConectadosSala= document.getElementById("ul-conectados-sala");
-            while(ulConectadosSala.firstChild){
-                ulConectadosSala.removeChild(ulConectadosSala.firstChild);
-            }
-
-            // console.log(cantConectadosEnMiSala);
-            if(listaUsuariosMiSala.length < cantConectadosEnMiSala){ //si disminuyen conectados mando el mensaje
-                // setTimeout(() => {
-                    let tiempo=new Date();
-                    liMensaje= crearLiMensaje(abandonador,"ABANDONÓ ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
-                    liMensaje.classList.add("abandonado-la-sala");
-                    ulMensajes.appendChild(liMensaje);
-                    let divMensajes= document.getElementById("mensajes");
-                    divMensajes.scrollTop= divMensajes.scrollHeight;
-                    abandonador="nulo";
-                // }, TIMEOUTESPERA+500);
-            }
-            cantConectadosEnMiSala=listaUsuariosMiSala.length;
-
-            listaUsuariosMiSala.forEach( (u)=>{
-
-                let liConectadoSala= document.createElement("li");
-                liConectadoSala.id="li-conectados-sala";
-                liConectadoSala.className="li-conectados-sala";
-
-                let pNombre= document.createElement("p");
-                pNombre.innerText=u.nombreUsuario;
-                if(u.nombreUsuario==adminSala){
-                    pNombre.innerText+=" (ADMIN)";
-                }
-
-                let pPuntaje = document.createElement("p");
-                pPuntaje.innerText=u.puntajeUsuario;
-
-                liConectadoSala.appendChild(pNombre);
-                liConectadoSala.appendChild(pPuntaje);
-
-                ulConectadosSala.appendChild(liConectadoSala);
-
-            })
-        },TIMEOUTESPERA);
-    })
-
-    let contador=0;
-    socket.on("elAbandonadorEs", (escrache)=>{
-        abandonador=escrache;
-    })
 })
+socket.on("elAbandonadorEs", (escrache)=>{
+    abandonador=escrache;
+})
+socket.on("actualizarMiSala", (miSala)=>{
+    setTimeout( ()=>{
+        tituloDeSala.innerText="Conectado a: "+miSala;
+        //listaUsuariosMiSala  -> esta variable la cargo con los usuarios q estan en mi sala al traer a los conectados
+        let datosSala= listaSalas.find(listaSalas => listaSalas.nombreSala== miSala)//busco los datos de esta sala para obtener el admin
+        let adminSala="";
+        
+        if(datosSala!==undefined){
+            adminSala= datosSala.adminSala;
+        }else{
+            adminSala= datosUsuario.nombreUsuario;
+        }
 
+        let ulConectadosSala= document.getElementById("ul-conectados-sala");
+        while(ulConectadosSala.firstChild){
+            ulConectadosSala.removeChild(ulConectadosSala.firstChild);
+        }
+
+        // console.log(cantConectadosEnMiSala);
+        if(listaUsuariosMiSala.length < cantConectadosEnMiSala){ //si disminuyen conectados mando el mensaje
+            // setTimeout(() => {
+                let tiempo=new Date();
+                liMensaje= crearLiMensaje(abandonador,"ABANDONÓ ESTA SALA",tiempo.getHours()+":"+tiempo.getMinutes());
+                liMensaje.classList.add("abandonado-la-sala");
+                ulMensajes.appendChild(liMensaje);
+                let divMensajes= document.getElementById("mensajes");
+                divMensajes.scrollTop= divMensajes.scrollHeight;
+                abandonador="nulo";
+            // }, TIMEOUTESPERA+500);
+        }
+        cantConectadosEnMiSala=listaUsuariosMiSala.length;
+
+        listaUsuariosMiSala.forEach( (u)=>{
+
+            let liConectadoSala= document.createElement("li");
+            liConectadoSala.id="li-conectados-sala";
+            liConectadoSala.className="li-conectados-sala";
+
+            let pNombre= document.createElement("p");
+            pNombre.innerText=u.nombreUsuario;
+            if(u.nombreUsuario==adminSala){
+                pNombre.innerText+=" (ADMIN)";
+            }
+
+            let pPreparado= document.createElement("p");
+            pPreparado.innerText= u.preparadoUsuario?"SI":"NO";
+
+            let pPuntaje = document.createElement("p");
+            pPuntaje.innerText=u.puntajeUsuario;
+
+            liConectadoSala.appendChild(pNombre);
+            liConectadoSala.appendChild(pPreparado);
+            liConectadoSala.appendChild(pPuntaje);
+
+            ulConectadosSala.appendChild(liConectadoSala);
+
+        })
+    },TIMEOUTESPERA);
+})
 
 /////////////////////////////////////////////////CHATS////////////////////////////////////////////////
 /////////////////////////////////////////////////CHATS////////////////////////////////////////////////
@@ -500,6 +500,8 @@ socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por 
         liMensaje.classList.add("se-a-unido-a-sala");
     }else if(datos.mensaje=="ABANDONÓ LA SALA"){
         liMensaje.classList.add("abandonado-la-sala");
+    }else if(datos.mensaje=="DETUVO EL JUEGO"){
+        liMensaje.classList.add("detuvo-el-juego");
     }
 
     ulMensajes.appendChild(liMensaje);
@@ -549,6 +551,7 @@ let cantUsuariosPreparados= 0;
 let gifContador= document.getElementById("contador-tiempo");
 let juegoIniciado=true;
 let btnBastaParaTodos= document.getElementById("btn-basta-para-todos");
+let juegoLanzado=false;
 
 
 
@@ -738,19 +741,22 @@ function crearLosLICategoria(categorias){
 
 function iniciar_cancelar(e){
     if(btnIniciarCancelar.value=="iniciar"){
+        socket.emit("actualizarMiSala",datosUsuario.salaUsuario);//mandarlo en el estoy listo
         // console.log("preparados :"+cantUsuariosPreparados);
         // console.log("conectados :"+cantConectadosEnMiSala);
         socket.emit("juego:yaIniciaron?",listaUsuariosMiSala);
         
-        setTimeout( ()=>{
+        setTimeout( ()=>{//espera que cargue la respuesta de ya iniciaron?
             if(juegoIniciado){
                 window.alert("El juego ya inicio espere un momento por favor");
                 return;
             }
+            btnEditarCategorias.classList.add("oculto");
             console.log(listaUsuariosMiSala);
             let info={
                 listaReceptores:listaUsuariosMiSala,
-                nombrePreparado:datosUsuario.nombreUsuario
+                nombrePreparado:datosUsuario.nombreUsuario,
+                preparado:true
             }
             
             cargarJugadoresPreparados();
@@ -758,6 +764,39 @@ function iniciar_cancelar(e){
             btnIniciarCancelar.value="cancelar";
             btnIniciarCancelar.innerText="Cancelar";
         },500);
+    }else{//presiono cancelar
+        socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
+        // btnEditarCategorias.classList.remove("oculto");
+
+        // console.log(listaUsuariosMiSala);
+
+        //aviso que no estoy preparado a los demas
+        let info={ 
+            listaReceptores:listaUsuariosMiSala,
+            nombrePreparado:datosUsuario.nombreUsuario,
+            preparado:false
+        }
+        socket.emit("juego:estoyListo",info);//mando los receptores, mi nombre, y true o false
+
+        btnIniciarCancelar.value="iniciar";
+        btnIniciarCancelar.innerText="Iniciar";
+        cargarJugadoresPreparados();
+
+        //le cargo a los demas que no estamos jugando
+        let info2={
+            receptores:listaUsuariosMiSala,
+            jugando:false
+        }
+        socket.emit("juego:iniciado",info2);//cambia el estado de los conectados-> jugando a falso
+
+        //aviso a los demas que cancele por mensaje
+        let datos={
+            listaReceptores:listaUsuariosMiSala,
+            usuario:datosUsuario.nombreUsuario,
+            mensaje:"DETUVO EL JUEGO",
+            hora:""
+        }
+        socket.emit("enviarMensaje",datos);
     }
 }
 function cargarJugadoresPreparados(){
@@ -771,29 +810,45 @@ function cargarJugadoresPreparados(){
 
 function lanzarElJuego(){
     console.log("juego iniciado");
-    socket.emit("juego:iniciado",listaUsuariosMiSala);//cambia el estado de los conectados a jugando
+    let datos={
+        receptores:listaUsuariosMiSala,
+        jugando:true
+    }
+    socket.emit("juego:iniciado",datos);//cambia el estado de los conectados-> jugando a true
 
     ulCategorias.classList.add("oculto");
     gifContador.classList.remove("oculto");
     setTimeout(()=>{
-        ulCategorias.classList.remove("oculto");
-        gifContador.classList.add("oculto");
-        btnIniciarCancelar.classList.add("oculto");
-        // juegoIniciado=true;
+        if(juegoLanzado){
+            ulCategorias.classList.remove("oculto");
+            gifContador.classList.add("oculto");
+            btnIniciarCancelar.classList.add("oculto");
+        }
     },TIEMPOESPERALANZAMIENTOJUEGO);
+}
+function detenerElJuego(nombre){
+    ulCategorias.classList.remove("oculto");
+    gifContador.classList.add("oculto");
+    // btnIniciarCancelar.classList.remove("oculto");
 }
 
 //ESCUCHAS DEL SOCKET
-socket.on("juego:usuarioPreparado", (nombre)=>{
+socket.on("juego:usuarioPreparado", (datos)=>{
     listaUsuariosMiSala.forEach( (usuario)=>{
-        if(usuario.nombreUsuario==nombre){
-            usuario.preparadoUsuario=true;
-            cantUsuariosPreparados++;
+        if(usuario.nombreUsuario==datos.nombre){
+            usuario.preparadoUsuario=datos.preparado;
+            cantUsuariosPreparados+= datos.preparado?1:-1;//si esta preparado los sumo sino lo resto
         }
     })
 
+    if(datos.preparado==false){//quiere decir que alguien aviso que no esta preparado
+        detenerElJuego(datos.nombre);
+        juegoLanzado=false;
+        return;
+    }
     if(cantUsuariosPreparados==cantConectadosEnMiSala){
         lanzarElJuego();
+        juegoLanzado=true;
     }
 })
 socket.on("juego:yaIniciaron?", (respuesta)=>{
