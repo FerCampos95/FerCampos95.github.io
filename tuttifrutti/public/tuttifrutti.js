@@ -1,6 +1,11 @@
 const socket= io();
 const TIMEOUTESPERA=1000;
 const TIEMPOESPERALANZAMIENTOJUEGO=6000;
+const VALORVACIO=0;//son los puntajes por palabras
+const VALORREPETIDO=5;//repetidas
+const VALORUNICO=10;//unicas
+
+
 
 let datosUsuario={
     nombreUsuario:"",
@@ -552,20 +557,113 @@ let gifContador= document.getElementById("contador-tiempo");
 let juegoIniciado=true;
 let btnBastaParaTodos= document.getElementById("btn-basta-para-todos");
 let juegoLanzado=false;
-
+let tablaResultados= document.getElementById("tabla-resultados");
+let puntajes=new Array();
+listaCategorias.forEach( ()=>{puntajes.push(0);});
+let divFormularioJuego= document.getElementById("formulario-juego");
+let btnAceptarResultados= document.getElementById("btn-aceptar-resultados");
 
 
 //EVENT LISTENERS JUEGO
 btnEditarCategorias.addEventListener("click",iniciar_finalizar_EdicionCategorias);
 btnAgregarCategiria.addEventListener("click",agregarCategoria);
 btnIniciarCancelar.addEventListener("click",iniciar_cancelar);///manda la señal que el jugador esta preparado
-btnBastaParaTodos.addEventListener("click",(e)=>{
-    cargarJugadoresPreparados();
-    console.log("preparados :"+cantUsuariosPreparados);
-    console.log("conectados :"+cantConectadosEnMiSala);
-})
+btnBastaParaTodos.addEventListener("click",basta_para_todos);
+tablaResultados.addEventListener("click",evento_tabla);
+btnAceptarResultados.addEventListener("click",aceptarResultados);
 
 //FUNCIONES JUEGO
+function aceptarResultados(e){
+    divFormularioJuego.classList.remove("oculto");
+    window.alert("mandar los resultados al servidor (PUNTAJES TOTALES)");
+}
+
+function evento_tabla(e){
+    let fila=e.path[1].rowIndex;
+    let columna=e.path[0].cellIndex;
+    // console.log("FILA: "+e.path[1].rowIndex);
+    // console.log("COLUMNA: "+e.path[0].cellIndex);
+    if(fila !==0 && columna!==0 && fila!==undefined && columna !==undefined && fila!==listaCategorias.length+1){
+        // console.log(tablaResultados);
+        // console.log(tablaResultados.childNodes[2].childNodes[0]);//es el tbody //obtengo los heads//primer fila
+        //cells[columna]//primera fila (0 es head categoria)(1 primer head)(2 segundo heado)//serian las columnas
+        //.textContent o innerText
+        // console.log(tablaResultados.childNodes[2].childNodes[0].cells[columna].innerText);
+        
+        let celda= tablaResultados.childNodes[2].childNodes[fila].cells[columna]; //con esto obtengo la celda que hizo click
+        let usuario= tablaResultados.childNodes[2].childNodes[0].cells[columna].innerText;//agarro el texto de la celda cabecera
+        if(usuario==datosUsuario.nombreUsuario){//si toque mis celdas
+            // console.log(tablaResultados.childNodes[2].childNodes[fila].cells[columna]);
+            // celda.classList.add("unico");
+            // listaClases=celda.className;
+            // console.log(listaClases);
+            if(celda.className=="unico"){
+                celda.className="repetido";
+                puntajes[fila-1]= VALORREPETIDO;
+            }else if(celda.className=="repetido"){
+                celda.className="vacio";
+                puntajes[fila-1]= VALORVACIO;
+            }else /*if(celda.className=="vacio")*/{
+                celda.className="unico";
+                puntajes[fila-1]= VALORUNICO;
+            }
+
+            //con cada click sumo los puntos
+            let celdaPuntos= tablaResultados.childNodes[2].childNodes[listaCategorias.length+1].childNodes[columna+1];
+            // console.log(celdaPuntos);
+            let sumaPuntos=0;
+            puntajes.forEach( (puntaje)=>{
+                sumaPuntos+=puntaje;
+            })
+            celdaPuntos.innerText=sumaPuntos;
+
+            let datos={
+                listaReceptores:listaUsuariosMiSala,
+                nombreUsuario:datosUsuario.nombreUsuario,
+                puntajesUsuario:puntajes
+            }
+            socket.emit("juego:refrescarResultadosTabla",datos);
+
+        }else{
+            console.log("No podes tocar las celdas de los demas");
+        }
+        
+        // console.log("fila: "+fila);
+        // console.log("columna: "+columna);
+    }
+
+}
+function refrescarTablaResultados(usuario,listaPuntajes){
+    let fila=0;
+    let columna=0;
+    let sumaPuntos=0;
+    //busco el usuario en la tabla
+    let celdasUsuarios= tablaResultados.childNodes[2].childNodes[0].cells;
+    
+//    celdasUsuarios.forEach( (celdaUsuario,index)=>{
+    for(let index=0; index<celdasUsuarios.length;index++){//recorro las celdas para encontrar el usuario
+        if(celdasUsuarios[index].innerText==usuario){//si es el usuario que refresco su tabla
+            columna=index;
+            let celda;
+            listaPuntajes.forEach( (puntaje,index)=>{
+                fila=index+1;
+                console.log("fila: "+fila);
+                console.log("columna: "+columna);
+                celda= tablaResultados.childNodes[2].childNodes[fila].cells[columna]; //con esto obtengo la celda que quiero pintar
+                switch(puntaje){
+                    case VALORVACIO: celda.className="vacio"; break;
+                    case VALORREPETIDO:celda.className="repetido"; break;
+                    case VALORUNICO: celda.className="unico";break;
+                }
+                sumaPuntos+=puntaje;
+            })
+            
+            let celdaPuntos= tablaResultados.childNodes[2].childNodes[listaCategorias.length+1].childNodes[columna+1];
+            celdaPuntos.innerText=sumaPuntos;
+        }
+    }
+}
+
 function iniciar_finalizar_EdicionCategorias(e){
     e.preventDefault();
     let soyAdmin=false;
@@ -823,6 +921,8 @@ function lanzarElJuego(){
             ulCategorias.classList.remove("oculto");
             gifContador.classList.add("oculto");
             btnIniciarCancelar.classList.add("oculto");
+            btnBastaParaTodos.classList.remove("oculto");
+            socket.emit("juego:resetearResultadosSala",datosUsuario.salaUsuario);
         }
     },TIEMPOESPERALANZAMIENTOJUEGO);
 }
@@ -832,6 +932,74 @@ function detenerElJuego(nombre){
     // btnIniciarCancelar.classList.remove("oculto");
 }
 
+function basta_para_todos(e){
+    socket.emit("juego:robarResultados",listaUsuariosMiSala);//de todos incluido el mio
+
+    btnBastaParaTodos.classList.add("oculto");
+    btnIniciarCancelar.classList.remove("oculto");
+    btnIniciarCancelar.value="iniciar";
+    btnIniciarCancelar.innerText="Iniciar";
+    window.alert("debo cortar el juego a los demas");
+    
+}
+function ocultarDivFormularioJuego(){divFormularioJuego.className="oculto";};
+function mostrarDivFormularioJuego(){divFormularioJuego.classList.remove("oculto");};
+
+function recopilarEnviarMisResultados(){
+    let elemento=0;
+    let resultado;
+    let resultados= new Array();
+    while(document.getElementById("input-"+elemento)!==null){
+        resultado=document.getElementById("input-"+elemento);
+        resultados.push(resultado.value);
+        elemento++;
+    }
+
+    let datos={
+        nombreSala:datosUsuario.salaUsuario,
+        nombreUsuario:datosUsuario.nombreUsuario,
+        resultadosUsuario:resultados
+    }
+    console.log(datos);
+    socket.emit("juego:recopilarResultados",datos);
+}
+function armarTablaDeResultados(listaResultados){
+    //nombreSala//nombreUsuario//resultadosUsuario
+
+    while(tablaResultados.firstChild){
+        tablaResultados.removeChild(tablaResultados.firstChild);
+    }
+    
+    let tabla=  `<caption>Resultados</caption>
+                <tr>
+                    <th>CATEGORIA</th>`;
+                    listaResultados.forEach( (result)=>{
+                        tabla+= `<th>${result.nombreUsuario}</th>`;
+                    });
+                tabla+=`</tr>`;
+                for(let i=0;i<listaCategorias.length;i++){
+                    tabla+=`<tr>`;
+                    tabla+=`<th>${listaCategorias[i]}</th>`;
+
+                    listaResultados.forEach( (result)=>{
+                        tabla+=`<td>${result.resultadosUsuario[i]}</td>`;
+                    })
+                    tabla+=`</tr>`;
+                }
+
+                tabla+=`<tr>
+                            <th>PUNTOS</th>`;
+                            for(let i=0;i<listaResultados.length;i++){
+                                tabla+=`<td>0</td>`;
+                            }
+                tabla+=`</tr>`;
+
+
+    tablaResultados.innerHTML=tabla;
+    return;
+}
+
+
 //ESCUCHAS DEL SOCKET
 socket.on("juego:usuarioPreparado", (datos)=>{
     listaUsuariosMiSala.forEach( (usuario)=>{
@@ -840,6 +1008,10 @@ socket.on("juego:usuarioPreparado", (datos)=>{
             cantUsuariosPreparados+= datos.preparado?1:-1;//si esta preparado los sumo sino lo resto
         }
     })
+
+    console.log(datos);
+    console.log(cantUsuariosPreparados);
+    console.log(cantConectadosEnMiSala);
 
     if(datos.preparado==false){//quiere decir que alguien aviso que no esta preparado
         detenerElJuego(datos.nombre);
@@ -854,6 +1026,28 @@ socket.on("juego:usuarioPreparado", (datos)=>{
 socket.on("juego:yaIniciaron?", (respuesta)=>{
     juegoIniciado=respuesta;
 })
+socket.on("juego:necesitoTusResultados", (nombreBastardo)=>{
+    recopilarEnviarMisResultados();
+    ocultarDivFormularioJuego();
+    window.alert(nombreBastardo+" dijo basta para todos, espere 3 segundos");
+    // console.log("enviando mis resultados y");
+    // console.log("pidiendo los resultados, espere 3 segundos");
+    setTimeout( ()=>{
+        socket.emit("juego:pedirResultadosSala",datosUsuario.salaUsuario);
+    },3000);
+})
+socket.on("juego:recibiendoResultados", (listaResultados)=>{
+    //armar la tabla con los resultados
+    console.log("resultados recibidos");
+    console.log(listaResultados);
+    armarTablaDeResultados(listaResultados);
+})
+
+socket.on("juego:refrescarResultadosTabla",(info)=>{ //nombreUsuario //puntajesUsuario
+    refrescarTablaResultados(info.nombreUsuario,info.puntajesUsuario);
+})
+
+
 
 
 

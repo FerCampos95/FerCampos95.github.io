@@ -212,6 +212,15 @@ td,th{
 th{
     background-color: gray;
 }
+.unico{
+    background-color: green;
+}
+.repetido{
+    background-color: yellow;
+}
+.vacio{
+    background-color: red;
+}
 
 .oculto{
     display: none;

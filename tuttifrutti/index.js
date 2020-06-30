@@ -20,6 +20,7 @@ const io= SocketIO(server);
 //variables de servidor
 let listaConectados= new Array(); //nombreUsuario,idUsuario,nombreSala,puntaje
 let listaSalas= new Array(); //nombreSala,adminSalam,cantConectados,conectados
+let listaResultadosSalas= new Array();//nombreSala //nombreUsuario //resultadosUsuario  
 
 //conexiones del servidor
 io.on("connection", (socket)=>{
@@ -129,9 +130,15 @@ io.on("connection", (socket)=>{
         listaSalas.forEach( (sala,index)=>{ //busco la sala
             if(sala.nombreSala== nombreSala){ //la encuentro
                 sala.cantConectados--; //quito 1 de la cantidad de conectados
-                sala.conectados.forEach( (u,index)=>{ //busco el conectado
+                sala.conectados.forEach( (u,index)=>{ //reviso todos los conectados
                     if(u == nombreUsuario){ //lo encuentro
                         sala.conectados.splice(index,1); //lo quito
+                    }else{//si no es le aviso que ya no esta(por si quieren jugar)
+                        let info={
+                            nombre:nombreUsuario,
+                            preparado:true //para que finja que si esta ok
+                        }
+                        io.to(obtenerID(u)).emit("juego:usuarioPreparado", info);
                     }
                 })
 
@@ -142,6 +149,10 @@ io.on("connection", (socket)=>{
                 }
             }
         })
+    }
+    function obtenerID(nombre){
+        let resultado= listaConectados.find(listaConectados => listaConectados.nombreUsuario==nombre);
+        return resultado.idUsuario;
     }
     
     
@@ -198,11 +209,47 @@ io.on("connection", (socket)=>{
                 }
             })
         })
-
         io.to(socket.id).emit("juego:yaIniciaron?", respuesta);
     })
+
+    socket.on("juego:recopilarResultados", (datos)=>{//datos contiene =
+        //nombreSala //nombreUsuario //resultadosUsuario  
+        listaResultadosSalas.push(datos);
+    })
+    socket.on("juego:robarResultados", (listaVictimas)=>{
+        listaVictimas.forEach( (victima)=>{
+            // if(victima.idUsuario!==socket.id){
+                io.to(victima.idUsuario).emit("juego:necesitoTusResultados",null);
+            // }
+        })
+    })
+    socket.on("juego:pedirResultadosSala", (nombreSala)=>{
+        let resultadosEstaSala= new Array();
+        listaResultadosSalas.forEach((resultadosSala)=>{
+            if(resultadosSala.nombreSala==nombreSala){
+                resultadosEstaSala.push(resultadosSala);
+            }
+        })
+        io.to(socket.id).emit("juego:recibiendoResultados",resultadosEstaSala);
+    })
     
+    socket.on("juego:refrescarResultadosTabla",(datos)=>{
+        let info={
+            nombreUsuario:datos.nombreUsuario,
+            puntajesUsuario:datos.puntajesUsuario
+        }
+        datos.listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("juego:refrescarResultadosTabla",info);
+        })
+    })
     
+    socket.on("juego:resetearResultadosSala", (nombreSala)=>{//eliminos los resultados de mi sala
+        listaResultadosSalas.forEach( (resultado,index)=>{//nombreSala //nombreUsuario //resultadosUsuario  
+            if(resultado.nombreSala==nombreSala){
+                listaResultadosSalas.splice(index,1);
+            }
+        })
+    })
 })
 
 // io.emit("ver",datosMensaje); //este es para ver los datos desde la consola del navegador
