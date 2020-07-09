@@ -225,7 +225,14 @@ function crearSala(e){
         socket.emit("conectarseASala",nombreSala);
         tituloDeSala.innerText="Conectado a: "+nombreSala;
         // datosUsuario.salaUsuario=nombreSala; //no necesario xq lo hace en el pedir sala
-        
+        // socket.emit("categorias:PedirCategorias",nombreSala);
+        let datos={
+            nombreSala:nombreSala,
+            listaReceptores:listaUsuariosMiSala,
+            listaCategorias:listaCategorias
+        }
+        socket.emit("categorias:cambioCategorias",datos)//nombreSala //listaReceptores //listaCategorias
+        btnEditarCategorias.classList.remove("oculto");
         ocultarCrearSala();
         mostrarSalaSeleccionada();
     }
@@ -257,6 +264,7 @@ function eventoUnirseSala(e){
         socket.emit("actualizarMiSala",nombreSala);
         mostrarSalaSeleccionada();
         window.scroll(0,document.body.scrollHeight);//hace scroll hasta abajo de todo
+        socket.emit("categorias:PedirCategorias",nombreSala);
         
         
         //PREPARO EL AVISO A LOS DEMAS PARTICIPANTES        
@@ -562,6 +570,9 @@ let puntajes=new Array();
 listaCategorias.forEach( ()=>{puntajes.push(0);});
 let divFormularioJuego= document.getElementById("formulario-juego");
 let btnAceptarResultados= document.getElementById("btn-aceptar-resultados");
+let divResultados= document.getElementById("resultados");
+let h2Letra=document.getElementById("titulo-letra");
+let listaLetrasUsadas= new Array();
 
 
 //EVENT LISTENERS JUEGO
@@ -574,8 +585,16 @@ btnAceptarResultados.addEventListener("click",aceptarResultados);
 
 //FUNCIONES JUEGO
 function aceptarResultados(e){
-    divFormularioJuego.classList.remove("oculto");
-    window.alert("mandar los resultados al servidor (PUNTAJES TOTALES)");
+    limpiarFormularioJuego();
+    // divFormularioJuego.classList.remove("oculto");
+    h2Letra.innerText="Esperando que acepte los resultados finales el administrador";
+  
+    let datos={//nombreUsuario //nombreSala //puntajesUsuario
+        nombreUsuario:datosUsuario.nombreUsuario,
+        nombreSala:datosUsuario.salaUsuario,
+        puntajesUsuario:puntajes
+    }
+    socket.emit("juego:aceptarResultados", datos);//manda los resultados al servidor (PUNTAJES TOTALES);
 }
 
 function evento_tabla(e){
@@ -664,8 +683,7 @@ function refrescarTablaResultados(usuario,listaPuntajes){
     }
 }
 
-function iniciar_finalizar_EdicionCategorias(e){
-    e.preventDefault();
+function chequearSiSoyAdmin(){
     let soyAdmin=false;
     listaSalas.forEach( (sala,index)=>{//recorro las salas
         if(sala.nombreSala== datosUsuario.salaUsuario){//si es mi sala
@@ -674,17 +692,31 @@ function iniciar_finalizar_EdicionCategorias(e){
             }
         }
     })
+    return soyAdmin;
+}
+
+function iniciar_finalizar_EdicionCategorias(e){
+    e.preventDefault();
+    let soyAdmin= chequearSiSoyAdmin();
+
     if(soyAdmin){
         if(btnEditarCategorias.value=="Editar Categorias"){
             mostrarBotonesEdicion();
             btnEditarCategorias.value="Finalizar Edicion";
             btnEditarCategorias.innerText="Finalizar Edicion";
             btnAgregarCategiria.classList.remove("oculto");
+            btnIniciarCancelar.classList.add("oculto");
         }else{
             ocultarBotonesEdicion();
             btnEditarCategorias.value="Editar Categorias";
             btnEditarCategorias.innerText="Editar Categorias";
             btnAgregarCategiria.classList.add("oculto");
+            btnIniciarCancelar.classList.remove("oculto");
+            let datos={//listaReceptores //listaCategorias
+                listaReceptores:listaUsuariosMiSala,
+                listaCategorias:listaCategorias
+            }
+            socket.emit("categorias:cambioCategorias",datos);
         }
     }else{
         window.alert("Solo puede editar el administrador de la sala");
@@ -775,6 +807,19 @@ function quitarPosicionCategoria(posicion){
 }
 
 function crearLosLICategoria(categorias){
+    if(chequearSiSoyAdmin()){
+        btnEditarCategorias.classList.remove("oculto");
+        // console.log("Soy admin");
+        // console.log("MOSTRANDO EL EDITAR");
+    }else{
+        btnEditarCategorias.classList.add("oculto");
+        // console.log("NO SOY ADMINISTRADOR");
+    }
+
+    //preparo el array de puntajes
+    puntajes=new Array();
+    categorias.forEach( ()=>{puntajes.push(0);});
+
     //limpio el ul
     while(ulCategorias.firstChild){
         ulCategorias.removeChild(ulCategorias.firstChild);
@@ -849,7 +894,9 @@ function iniciar_cancelar(e){
                 window.alert("El juego ya inicio espere un momento por favor");
                 return;
             }
-            btnEditarCategorias.classList.add("oculto");
+            if(chequearSiSoyAdmin()){
+                btnEditarCategorias.classList.add("oculto");
+            }
             console.log(listaUsuariosMiSala);
             let info={
                 listaReceptores:listaUsuariosMiSala,
@@ -907,7 +954,7 @@ function cargarJugadoresPreparados(){
 }
 
 function lanzarElJuego(){
-    console.log("juego iniciado");
+    // console.log("juego iniciado");
     let datos={
         receptores:listaUsuariosMiSala,
         jugando:true
@@ -922,28 +969,41 @@ function lanzarElJuego(){
             gifContador.classList.add("oculto");
             btnIniciarCancelar.classList.add("oculto");
             btnBastaParaTodos.classList.remove("oculto");
-            socket.emit("juego:resetearResultadosSala",datosUsuario.salaUsuario);
+            document.getElementById("input-0").focus();
+            //HACER ESTO SI ES EL ADMIN
+            let soyAdmin=chequearSiSoyAdmin();
+            if(soyAdmin){
+                socket.emit("juego:resetearResultadosSala",datosUsuario.salaUsuario);
+                let datos={
+                    listaLetrasUsadas:listaLetrasUsadas,
+                    listaReceptores:listaUsuariosMiSala
+                }
+                socket.emit("juego:obtenerLetra",datos);
+            }
         }
     },TIEMPOESPERALANZAMIENTOJUEGO);
-}
-function detenerElJuego(nombre){
-    ulCategorias.classList.remove("oculto");
-    gifContador.classList.add("oculto");
-    // btnIniciarCancelar.classList.remove("oculto");
 }
 
 function basta_para_todos(e){
     socket.emit("juego:robarResultados",listaUsuariosMiSala);//de todos incluido el mio
 
+    juegoIniciado=false;
+    juegoLanzado=false;
+
+    socket.emit("juego:resetear",listaUsuariosMiSala);
+}
+function finalizarYReiniciarElJuego(){
     btnBastaParaTodos.classList.add("oculto");
     btnIniciarCancelar.classList.remove("oculto");
     btnIniciarCancelar.value="iniciar";
     btnIniciarCancelar.innerText="Iniciar";
-    window.alert("debo cortar el juego a los demas");
-    
+    cantUsuariosPreparados=0;
+    cantConectadosEnMiSala=listaUsuariosMiSala.length;
 }
 function ocultarDivFormularioJuego(){divFormularioJuego.className="oculto";};
-function mostrarDivFormularioJuego(){divFormularioJuego.classList.remove("oculto");};
+function mostrarDivFormularioJuego(){h2Letra.innerText='Letra:"-"'; divFormularioJuego.classList.remove("oculto");};
+function ocultarDivResultados(){ divResultados.className="oculto";};
+function mostrarDivResultados(){ divResultados.classList.remove("oculto");};
 
 function recopilarEnviarMisResultados(){
     let elemento=0;
@@ -960,9 +1020,25 @@ function recopilarEnviarMisResultados(){
         nombreUsuario:datosUsuario.nombreUsuario,
         resultadosUsuario:resultados
     }
-    console.log(datos);
+    // console.log(datos);
     socket.emit("juego:recopilarResultados",datos);
 }
+
+function limpiarFormularioJuego(){
+    let i=0;
+    let input= document.getElementById("input-"+i);
+    while(input!==null){
+        input.value="";
+        i++;
+        input= document.getElementById("input-"+i);
+    }
+    if(chequearSiSoyAdmin()){
+        btnEditarCategorias.classList.remove("oculto");
+    }else{
+        btnEditarCategorias.classList.add("oculto");
+    }
+}
+
 function armarTablaDeResultados(listaResultados){
     //nombreSala//nombreUsuario//resultadosUsuario
 
@@ -1009,7 +1085,7 @@ socket.on("juego:usuarioPreparado", (datos)=>{
         }
     })
 
-    console.log(datos);
+    // console.log(datos);
     console.log(cantUsuariosPreparados);
     console.log(cantConectadosEnMiSala);
 
@@ -1028,26 +1104,83 @@ socket.on("juego:yaIniciaron?", (respuesta)=>{
 })
 socket.on("juego:necesitoTusResultados", (nombreBastardo)=>{
     recopilarEnviarMisResultados();
+    finalizarYReiniciarElJuego();
     ocultarDivFormularioJuego();
-    window.alert(nombreBastardo+" dijo basta para todos, espere 3 segundos");
-    // console.log("enviando mis resultados y");
-    // console.log("pidiendo los resultados, espere 3 segundos");
+    h2Letra.innerText=nombreBastardo+" dijo: Basta para todos, espere 3 segundos."
     setTimeout( ()=>{
+        h2Letra.innerText=nombreBastardo+" dijo: Basta para todos.";
         socket.emit("juego:pedirResultadosSala",datosUsuario.salaUsuario);
     },3000);
 })
+socket.on("juego:volveAPedirResultados",(nada)=>{//se usa cuando el admin no acepta los resultados
+    ocultarDivFormularioJuego();
+    h2Letra.innerText="Volve a chequear tus Resultados.";
+    socket.emit("juego:pedirResultadosSala",datosUsuario.salaUsuario);
+})
+
 socket.on("juego:recibiendoResultados", (listaResultados)=>{
     //armar la tabla con los resultados
-    console.log("resultados recibidos");
-    console.log(listaResultados);
     armarTablaDeResultados(listaResultados);
+    mostrarDivResultados();
 })
 
 socket.on("juego:refrescarResultadosTabla",(info)=>{ //nombreUsuario //puntajesUsuario
     refrescarTablaResultados(info.nombreUsuario,info.puntajesUsuario);
 })
 
+socket.on("juego:ResultadosJugada", (listaResultadosMiSala)=>{//solo le llega al admin
+    //nombreSala //nombreUsuario //resultadosUsuario  //puntajesUsuario (contiene el punto de cada celda)
+    setTimeout(()=>{
+        if(window.confirm("Usted es el Administrador, Desea confirmar los resultados recibidos?")){
+            let listaDatos=new Array();
+            let dato;
+            let totalPuntaje=0;
+            listaResultadosMiSala.forEach( (resultado)=>{
+                resultado.puntajesUsuario.forEach( (puntos)=>{//sumo todos los puntos del usuario
+                    totalPuntaje+=puntos;
+                })
+                dato={//preparo cada usuario y su puntaje
+                    nombreUsuario:resultado.nombreUsuario,
+                    puntajeUsuario:totalPuntaje
+                }
+                listaDatos.push(dato);
+                totalPuntaje=0;
+            })
+            socket.emit("juego:guardarPuntajesJugada",listaDatos);//nombreUsuario //puntajeUsuario
+            
+        }else{
+            //borra los puntajes para que los vuelvan a hacer y reenviar
+            socket.emit("juego:resetearResultados",datosUsuario.salaUsuario)//nombreSala
+            //hace que todos pidan otra ves el resultado de los demas y genera la tabla otra vez
+            socket.emit("juego:adminNoAceptoResultados",listaUsuariosMiSala);
+        }
+    },1000);
+})
 
+socket.on("juego:llegoLetra",(letra)=>{
+    console.log(letra);
+    listaLetrasUsadas.push(letra);
+    
+    h2Letra.innerText='Letra: "'+letra+'"';
+    if(listaLetrasUsadas.length==27){
+        console.log("Se completo el abecedario, avisar a todos y reiniciar el array");
+        console.log("Se completo el abecedario, avisar a todos y reiniciar el array");
+        console.log("Se completo el abecedario, avisar a todos y reiniciar el array");
+        console.log("Se completo el abecedario, avisar a todos y reiniciar el array");
+        socket.emit("juego:reiniciarLetrasUsadas",listaUsuariosMiSala);
+    }
+});
+socket.on("juego:reiniciarLetrasUsadas",(nada)=>{
+    listaLetrasUsadas=new Array();
+})
+
+socket.on("categorias:recibirCategorias",(categorias)=>{
+    listaCategorias=categorias;
+    // console.log("Las categorias Son");
+    // console.log(listaCategorias);
+    crearLosLICategoria(listaCategorias);
+    ocultarBotonesEdicion();
+})
 
 
 
@@ -1056,6 +1189,15 @@ socket.on("ver", (datos)=>{
     console.log(datos);
 })
 
+//SOCKET GENERAL
+socket.on("todo:refrescarDatosPagina", (nulo)=>{
+    socket.emit("pedirConectados");
+    socket.emit("pedirSalas");
+    socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
+    ocultarDivResultados();
+    mostrarDivFormularioJuego();
+    window.alert("pagina actualizada");
+})
 
 //EJECUCIONES INICIALES - LLAMADOS AUTOMATICOS
 socket.emit("pedirConectados");
@@ -1063,6 +1205,7 @@ socket.emit("pedirSalas");
 inputUsuario.focus();
 ocultarUsuariosYSalas();
 ocultarSalaSeleccionada();
+ocultarDivResultados();
 
 crearLosLICategoria(listaCategorias);
 ocultarBotonesEdicion();

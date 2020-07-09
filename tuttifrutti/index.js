@@ -19,8 +19,9 @@ const io= SocketIO(server);
 
 //variables de servidor
 let listaConectados= new Array(); //nombreUsuario,idUsuario,nombreSala,puntaje
-let listaSalas= new Array(); //nombreSala,adminSalam,cantConectados,conectados
-let listaResultadosSalas= new Array();//nombreSala //nombreUsuario //resultadosUsuario  
+let listaSalas= new Array(); //nombreSala,adminSala,cantConectados,conectados
+let listaResultadosSalas= new Array();//nombreSala //nombreUsuario //resultadosUsuario 
+let listaCategoriasSala= new Array();//nombreSala //listaCategorias 
 
 //conexiones del servidor
 io.on("connection", (socket)=>{
@@ -154,7 +155,48 @@ io.on("connection", (socket)=>{
         let resultado= listaConectados.find(listaConectados => listaConectados.nombreUsuario==nombre);
         return resultado.idUsuario;
     }
-    
+    function obtenerNombre(id){ 
+        let resultado= listaConectados.find(listaConectados => listaConectados.idUsuario==id);
+        return resultado.nombreUsuario;
+    }
+    /////////FUNCIONES CATEGORIAS
+    socket.on("categorias:cambioCategorias",(datos)=>{//nombreSala//listaReceptores //listaCategorias
+        let sala= datos.nombreSala; //todos los usuario estan en la misma sala
+        let salaGuardada=false;
+        listaCategoriasSala.forEach((estaSala)=>{
+            if(sala== estaSala.nombreSala){//si la sala ya esta la actualizo
+                salaGuardada=true;
+                estaSala.categorias=datos.listaCategorias;
+            }
+        })
+        if(!salaGuardada){
+            let info={
+                nombreSala:sala,
+                categorias:datos.listaCategorias
+            }
+            listaCategoriasSala.push(info);
+        }
+
+        let categoriasMiSala;
+        listaCategoriasSala.forEach((estaSala)=>{
+            if(estaSala.nombreSala== sala){
+                categoriasMiSala=estaSala.categorias;
+            }
+        })
+        
+        datos.listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("categorias:recibirCategorias",categoriasMiSala);
+        })
+    })
+    socket.on("categorias:PedirCategorias",(sala)=>{
+        let categoriasMiSala;
+        listaCategoriasSala.forEach((estaSala)=>{
+            if(estaSala.nombreSala== sala){
+                categoriasMiSala=estaSala.categorias;
+            }
+        })
+        io.to(socket.id).emit("categorias:recibirCategorias",categoriasMiSala);
+    })
     
     ///////FUNCIONES PARA CHAT
     socket.on("enviarMensaje", (info)=>{ //datos es: listarecemptores,usuario,mensaje,hora
@@ -198,6 +240,16 @@ io.on("connection", (socket)=>{
             })
         })
     })
+    socket.on("juego:resetear",(listaReceptores)=>{
+        listaReceptores.forEach( (jugador)=>{
+            listaConectados.forEach( (usuario)=>{
+                if(usuario.nombreUsuario==jugador.nombreUsuario){
+                    usuario.jugandoUsuario=false;
+                    usuario.preparadoUsuario=false;
+                }
+            })
+        })
+    })
     socket.on("juego:yaIniciaron?",(listaJugadores)=>{
         let respuesta=false;
 
@@ -213,16 +265,63 @@ io.on("connection", (socket)=>{
     })
 
     socket.on("juego:recopilarResultados", (datos)=>{//datos contiene =
-        //nombreSala //nombreUsuario //resultadosUsuario  
-        listaResultadosSalas.push(datos);
+        //nombreSala //nombreUsuario //resultadosUsuario  //y agrego puntajes (contiene el punto de cada celda)
+        let info={
+            nombreSala:datos.nombreSala,
+            nombreUsuario:datos.nombreUsuario,
+            resultadosUsuario:datos.resultadosUsuario,
+            puntajesUsuario:null//lo cargo en otro socket
+        }
+        listaResultadosSalas.push(info);
     })
-    socket.on("juego:robarResultados", (listaVictimas)=>{
-        listaVictimas.forEach( (victima)=>{
-            // if(victima.idUsuario!==socket.id){
-                io.to(victima.idUsuario).emit("juego:necesitoTusResultados",null);
-            // }
+    socket.on("juego:aceptarResultados", (datos)=>{//nombreUsuario //nombreSala //puntajesUsuario
+        let puntajesCompletos=true;
+      
+        listaResultadosSalas.forEach( (resultado)=>{
+            if(resultado.nombreUsuario==datos.nombreUsuario){
+                resultado.puntajesUsuario=datos.puntajesUsuario;
+            }
+            if(resultado.nombreSala==datos.nombreSala && resultado.puntajesUsuario==null){//quiere decir que alguien no mando su puntaje
+                puntajesCompletos=false;
+            }
+        })
+        if(puntajesCompletos){//entonces todos los usuario enviaron(de esta sala) enviaron su puntaje
+            let resultadosEstaSala= new Array();
+            listaResultadosSalas.forEach( (resultadosSala)=>{
+                if(resultadosSala.nombreSala=datos.nombreSala)
+                    resultadosEstaSala.push(resultadosSala);
+            })
+
+            listaSalas.forEach( (sala)=>{
+                if(sala.nombreSala==datos.nombreSala){
+                    //busco el admin y le aviso q estan todos los resultados
+                    let id= obtenerID(sala.adminSala);
+                    io.to(id).emit("juego:ResultadosJugada", resultadosEstaSala);
+                }
+            })
+        }
+    })
+    socket.on("juego:resetearResultados", (nombreSala)=>{//nombreSala
+        listaResultadosSalas.forEach( (resultado)=>{
+            if(resultado.nombreSala==nombreSala){
+                resultado.puntajesUsuario=null;
+            }
         })
     })
+
+
+    socket.on("juego:robarResultados", (listaVictimas)=>{
+        listaVictimas.forEach( (victima)=>{
+            io.to(victima.idUsuario).emit("juego:necesitoTusResultados",obtenerNombre(socket.id));
+        })
+    })
+
+    socket.on("juego:adminNoAceptoResultados",(listaReceptores)=>{
+        listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("juego:volveAPedirResultados",null);
+        })
+    })
+        
     socket.on("juego:pedirResultadosSala", (nombreSala)=>{
         let resultadosEstaSala= new Array();
         listaResultadosSalas.forEach((resultadosSala)=>{
@@ -236,7 +335,7 @@ io.on("connection", (socket)=>{
     socket.on("juego:refrescarResultadosTabla",(datos)=>{
         let info={
             nombreUsuario:datos.nombreUsuario,
-            puntajesUsuario:datos.puntajesUsuario
+            puntajesUsuario:datos.puntajesUsuario//tiene un array con el puntaje de cada categoria
         }
         datos.listaReceptores.forEach( (receptor)=>{
             io.to(receptor.idUsuario).emit("juego:refrescarResultadosTabla",info);
@@ -250,7 +349,47 @@ io.on("connection", (socket)=>{
             }
         })
     })
+
+    socket.on("juego:guardarPuntajesJugada", (listaDatos)=>{//nombreUsuario //puntajeUsuario
+        listaDatos.forEach( (dato)=>{
+            listaConectados.forEach( (conectado)=>{
+                if(conectado.nombreUsuario== dato.nombreUsuario){
+                    conectado.puntajeUsuario+=dato.puntajeUsuario;
+                }
+            })
+        })
+        io.emit("todo:refrescarDatosPagina",null);
+    });
+
+    socket.on("juego:obtenerLetra",(datos)=>{//listaLetrasUsadas //listaReceptores
+        let letras=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','Ñ','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+        let posicion;
+        let letra;
+        let repetida=false;
+        // console.log("LETRAS USADAS:"+datos.listaLetrasUsadas);
+        do{
+            repetida=false;
+            posicion= Math.floor(Math.random() * (26 - 0 + 1)) + 0;
+            letra= letras[posicion];
+
+            datos.listaLetrasUsadas.forEach( (l)=>{
+                if(letra==l){
+                    repetida=true;
+                }
+            })
+            // console.log("INTENTO:"+letra);
+        }while(repetida==true && datos.listaLetrasUsadas.length!==27);
+
+        datos.listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("juego:llegoLetra",letra);
+        })
+        // console.log("ENVIADA:"+letra);
+    });
+    
+    socket.on("juego:reiniciarLetrasUsadas",(listaReceptores)=>{
+        listaReceptores.forEach( (receptor)=>{
+            io.to(receptor.idUsuario).emit("juego:reiniciarLetrasUsadas",null);
+        })
+    });
+
 })
-
-// io.emit("ver",datosMensaje); //este es para ver los datos desde la consola del navegador
-
