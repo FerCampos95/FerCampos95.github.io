@@ -274,7 +274,8 @@ function eventoUnirseSala(e){
                 listaReceptores:listaUsuariosMiSala,
                 usuario:datosUsuario.nombreUsuario,
                 mensaje:"SE UNIÓ A ESTA SALA",
-                hora:tiempo.getHours()+":"+tiempo.getMinutes()
+                hora:tiempo.getHours()+":"+tiempo.getMinutes(),
+                tipo:"unio"
             }
             socket.emit("enviarMensaje",datos); 
         }, TIMEOUTESPERA+1000);
@@ -380,12 +381,15 @@ socket.on("actualizarMiSala", (miSala)=>{
             if(u.nombreUsuario==adminSala){
                 pNombre.innerText+=" (ADMIN)";
             }
+            pNombre.className="li-conectado-nombre";
 
             let pPreparado= document.createElement("p");
             pPreparado.innerText= u.preparadoUsuario?"SI":"NO";
+            pPreparado.className="li-conectado-preparado";
 
             let pPuntaje = document.createElement("p");
             pPuntaje.innerText=u.puntajeUsuario;
+            pPuntaje.className="li-conectado-puntaje";
 
             liConectadoSala.appendChild(pNombre);
             liConectadoSala.appendChild(pPreparado);
@@ -509,12 +513,14 @@ socket.on("recibirMensaje", (datos)=>{ ///lo recibiria solo yo xq lo envian por 
         // liMensaje.classList.add("mensaje-otro");
     }
 
-    if(datos.mensaje== "SE UNIÓ A ESTA SALA"){
+    if(datos.tipo== "unio"){
         liMensaje.classList.add("se-a-unido-a-sala");
-    }else if(datos.mensaje=="ABANDONÓ LA SALA"){
+    }else if(datos.tipo=="salio"){
         liMensaje.classList.add("abandonado-la-sala");
-    }else if(datos.mensaje=="DETUVO EL JUEGO"){
+    }else if(datos.tipo=="detuvo"){
         liMensaje.classList.add("detuvo-el-juego");
+    }else if(datos.tipo=="info"){
+        liMensaje.classList.add("informativo");
     }
 
     ulMensajes.appendChild(liMensaje);
@@ -532,10 +538,10 @@ socket.on("escribiendo", (escritores)=>{
 
     let estadoEscribiendo= document.getElementById("p-estado");
     let cantEscritores= escritores.length;
-    console.log(escritores);
+    // console.log(escritores);
 
     if(cantEscritores ==0){
-        estadoEscribiendo.innerText="Nadie escribe";
+        estadoEscribiendo.innerText=" ";
     }else if(cantEscritores ==1){
         estadoEscribiendo.innerText= escritores[0]+ " esta escribiendo";
     }else if(cantEscritores ==2){
@@ -644,7 +650,11 @@ function evento_tabla(e){
             socket.emit("juego:refrescarResultadosTabla",datos);
 
         }else{
-            console.log("No podes tocar las celdas de los demas");
+            // console.log("No podes tocar las celdas de los demas");
+            tablaResultados.style.cursor="not-allowed";
+            setTimeout(()=>{
+                tablaResultados.style.cursor="pointer";
+            },400);
         }
         
         // console.log("fila: "+fila);
@@ -897,7 +907,7 @@ function iniciar_cancelar(e){
             if(chequearSiSoyAdmin()){
                 btnEditarCategorias.classList.add("oculto");
             }
-            console.log(listaUsuariosMiSala);
+            // console.log(listaUsuariosMiSala);
             let info={
                 listaReceptores:listaUsuariosMiSala,
                 nombrePreparado:datosUsuario.nombreUsuario,
@@ -906,14 +916,22 @@ function iniciar_cancelar(e){
             
             cargarJugadoresPreparados();
             socket.emit("juego:estoyListo",info);//mando a quienes le envio y mi nombre
+            let tiempo=new Date();
+            let datos={
+                listaReceptores:listaUsuariosMiSala,
+                usuario:datosUsuario.nombreUsuario,
+                mensaje:"ESTOY LIST@",
+                hora:tiempo.getHours()+":"+tiempo.getMinutes(),
+                tipo:"info"
+            }
+            socket.emit("enviarMensaje",datos); 
             btnIniciarCancelar.value="cancelar";
             btnIniciarCancelar.innerText="Cancelar";
         },500);
     }else{//presiono cancelar
         socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
-        // btnEditarCategorias.classList.remove("oculto");
-
-        // console.log(listaUsuariosMiSala);
+        if(chequearSiSoyAdmin())
+            btnEditarCategorias.classList.remove("oculto");
 
         //aviso que no estoy preparado a los demas
         let info={ 
@@ -939,7 +957,8 @@ function iniciar_cancelar(e){
             listaReceptores:listaUsuariosMiSala,
             usuario:datosUsuario.nombreUsuario,
             mensaje:"DETUVO EL JUEGO",
-            hora:""
+            hora:"",
+            tipo:"detuvo"
         }
         socket.emit("enviarMensaje",datos);
     }
@@ -982,6 +1001,10 @@ function lanzarElJuego(){
             }
         }
     },TIEMPOESPERALANZAMIENTOJUEGO);
+}
+function detenerElJuego(nombre){
+    ulCategorias.classList.remove("oculto");
+    gifContador.classList.add("oculto");
 }
 
 function basta_para_todos(e){
@@ -1042,7 +1065,7 @@ function limpiarFormularioJuego(){
 function armarTablaDeResultados(listaResultados){
     //nombreSala//nombreUsuario//resultadosUsuario
 
-    while(tablaResultados.firstChild){
+    while(tablaResultados.firstChild){//limpio la tabla vieja
         tablaResultados.removeChild(tablaResultados.firstChild);
     }
     
@@ -1072,6 +1095,7 @@ function armarTablaDeResultados(listaResultados){
 
 
     tablaResultados.innerHTML=tabla;
+    console.log("LA TABLA MIDE: "+tabla.clientWidth);
     return;
 }
 
@@ -1121,6 +1145,7 @@ socket.on("juego:volveAPedirResultados",(nada)=>{//se usa cuando el admin no ace
 socket.on("juego:recibiendoResultados", (listaResultados)=>{
     //armar la tabla con los resultados
     armarTablaDeResultados(listaResultados);
+    
     mostrarDivResultados();
 })
 
@@ -1130,11 +1155,13 @@ socket.on("juego:refrescarResultadosTabla",(info)=>{ //nombreUsuario //puntajesU
 
 socket.on("juego:ResultadosJugada", (listaResultadosMiSala)=>{//solo le llega al admin
     //nombreSala //nombreUsuario //resultadosUsuario  //puntajesUsuario (contiene el punto de cada celda)
+    btnEditarCategorias.classList.add("oculto");
     setTimeout(()=>{
         if(window.confirm("Usted es el Administrador, Desea confirmar los resultados recibidos?")){
             let listaDatos=new Array();
             let dato;
             let totalPuntaje=0;
+            console.log(listaResultadosMiSala);
             listaResultadosMiSala.forEach( (resultado)=>{
                 resultado.puntajesUsuario.forEach( (puntos)=>{//sumo todos los puntos del usuario
                     totalPuntaje+=puntos;
@@ -1147,7 +1174,7 @@ socket.on("juego:ResultadosJugada", (listaResultadosMiSala)=>{//solo le llega al
                 totalPuntaje=0;
             })
             socket.emit("juego:guardarPuntajesJugada",listaDatos);//nombreUsuario //puntajeUsuario
-            
+            btnEditarCategorias.classList.remove("oculto");
         }else{
             //borra los puntajes para que los vuelvan a hacer y reenviar
             socket.emit("juego:resetearResultados",datosUsuario.salaUsuario)//nombreSala
@@ -1196,15 +1223,14 @@ socket.on("todo:refrescarDatosPagina", (nulo)=>{
     socket.emit("actualizarMiSala",datosUsuario.salaUsuario);
     ocultarDivResultados();
     mostrarDivFormularioJuego();
-    window.alert("pagina actualizada");
 })
 
 //EJECUCIONES INICIALES - LLAMADOS AUTOMATICOS
 socket.emit("pedirConectados");
 socket.emit("pedirSalas");
 inputUsuario.focus();
-ocultarUsuariosYSalas();
-ocultarSalaSeleccionada();
+//ocultarUsuariosYSalas();
+//ocultarSalaSeleccionada();
 ocultarDivResultados();
 
 crearLosLICategoria(listaCategorias);

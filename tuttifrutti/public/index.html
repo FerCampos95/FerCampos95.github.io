@@ -27,10 +27,8 @@
             <div id="usuarios">
                 <h2>Usuarios conectados</h2>
                 <li>
-                    <!-- <p>----Usuario----</p>
-                    <p>----------En la Sala----------</p> -->
-                    <p style="flex:1 2 auto">Usuario</p>
-                    <p style="flex:1 1 auto;">En la Sala</p>
+                    <p style="flex:1 2 auto; font-weight: bold;">USUARIO</p>
+                    <p style="flex:1 1 auto; font-weight: bold;">EN LA SALA</p>
                 </li>
                 <ul id="ul-conectados">
                     <li id="li-conectados" class="li-conectados">
@@ -42,8 +40,8 @@
             <div id="salas" >
                 <h2>Salas</h2>
                 <li>
-                    <p style="flex: 20 1 auto;">Nombre de la sala</p>
-                    <p style="flex: 1 1 auto;">N° Conectados</p>
+                    <p style="flex: 20 1 auto; font-weight: bold;">NOMBRE DE LA SALA</p>
+                    <p style="flex: 1 1 auto; font-weight: bold;">N° CONECTADOS</p>
                 </li>
                 <ul id="ul-salas">
                     <li id="li-salas">
@@ -65,29 +63,31 @@
                 <button id="btn-cancelar-crear-sala">Cancelar</button>
 
             </div>
-            <div id="conectados-sala">
-                <h2>Usuarios conectados en esta Sala</h2>
-                <li>
-                    <p style="flex: 20 1 auto;">Usuario</p>
-                    <p style="flex: 1 1 auto;">Preparado</p>
-                    <p style="flex: 1 1 auto;">Puntaje</p>
-                </li>
-                <ul id="ul-conectados-sala">
-                    <li id="li-conectados-sala">
-                        <p>nombre usuario</p>
-                        <p>NO</p>
-                        <p>puntaje</p>
-                    </li>
-                </ul>
-            </div>
+            
 
         </div>
             
         <!-- SALA SELECCIONADA -->
         <div id="sala-seleccionada">
             <div id="header-sala">
-                <h2 id="titulo-sala">Sala: Nombre de la Sala</h2>
                 <button id="btn-salir-sala">Salir de la sala</button>
+                <h2 id="titulo-sala">Sala: Nombre de la Sala</h2>
+                <div id="conectados-sala">
+                    <h2>Usuarios conectados en esta Sala</h2>
+                    <li>
+                        <p style="flex: 20 1 auto; font-weight: bold;">USUARIO</p>
+                        <p style="flex: 1 1 auto; font-weight: bold;">PREPARADO</p>
+                        <p style="flex: 2 1 auto; font-weight: bold;">PUNTAJE</p>
+                    </li>
+                    <ul id="ul-conectados-sala">
+                        <li id="li-conectados-sala">
+                            <p>nombre usuario</p>
+                            <p>NO</p>
+                            <p>puntaje</p>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
             
 
@@ -121,29 +121,49 @@
                     <button id="btn-basta-para-todos" class="oculto">Basta para todos</button>
                 </div>
                 <div id="resultados">
-                    <table id="tabla-resultados">
-                        <caption>Resultados</caption>
-                        <tr>
-                            <th>CATEGORIA</th>
-                            <th>USUARIO 1</th>
-                            <th>USUARIO 2</th>
-                        </tr>
-                        <tr>
-                            <th>CAT-1</th>
-                            <td>res</td>
-                            <td>res</td>
-                        </tr>
-                        <tr>
-                            <th>CAT-2</th>
-                            <td>res</td>
-                            <td>res</td>
-                        </tr>
-                        <tr>
-                            <th>PUNTOS</th>
-                            <td>0</td>
-                            <td>0</td>
-                        </tr>
-                    </table>
+                    <div id="explicacion-puntajes">
+                        <p>Haga click en sus celdas para seleccionar los colores</p>
+                        <!-- <button id="ocultar-explicacion">Ocultar</button> -->
+                        <table>
+                            <tr>
+                                <th>Color</th>
+                                <td class="unico">unico</td>
+                                <td class="repetido">repetido</td>
+                                <td class="vacio">vacio</td>
+                            </tr>
+                            <tr>
+                                <th>Valor</th>
+                                <td class="unico">10 pts.</td>
+                                <td class="repetido">5 pts.</td>
+                                <td class="vacio">0 pts.</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="div-tabla-resultados">
+                        <table id="tabla-resultados">
+                            <caption>Resultados</caption>
+                            <tr>
+                                <th>CATEGORIA</th>
+                                <th>USUARIO 1</th>
+                                <th>USUARIO 2</th>
+                            </tr>
+                            <tr>
+                                <th>CAT-1</th>
+                                <td>res</td>
+                                <td>res</td>
+                            </tr>
+                            <tr>
+                                <th>CAT-2</th>
+                                <td>res</td>
+                                <td>res</td>
+                            </tr>
+                            <tr>
+                                <th>PUNTOS</th>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </table>
+                    </div>
                     <button id="btn-aceptar-resultados">Aceptar Resultados</button>
                 </div>
             </div>
@@ -155,7 +175,7 @@
                     <h2>Chat de la Sala</h2>
                     <div id="mensajes">
                         <ul id="ul-mensajes" class="ul-mensajes">
-                            <li id="li-mensajes" class="li-mensajes ">
+                            <!-- <li id="li-mensajes" class="li-mensajes ">
                                 <p class="usr">Fernando</p>
                                 <p class="msj">Este es un mensaje</p>
                                 <p class="hora">10:25</p>
@@ -189,10 +209,10 @@
                                 <p class="usr">Fernando</p>
                                 <p class="msj">Este es un mensaje</p>
                                 <p class="hora">10:25</p>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
-                    <p id="p-estado">Alguien esta escribiendo</p>
+                    <p id="p-estado"> </p>
                     <div id="barra-mensaje">
                         <textarea id="input-mensaje" placeholder="Escriba aquí su mensaje.."></textarea>
                         <button id="btn-enviar-mensaje">Enviar</button>

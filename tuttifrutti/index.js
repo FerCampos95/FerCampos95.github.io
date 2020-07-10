@@ -204,7 +204,8 @@ io.on("connection", (socket)=>{
             let datosMensaje={
                 usuario:info.usuario,
                 mensaje:info.mensaje,
-                hora:info.hora
+                hora:info.hora,
+                tipo:info.tipo
             }
             io.to(receptor.idUsuario).emit("recibirMensaje", datosMensaje);
         })
@@ -266,6 +267,7 @@ io.on("connection", (socket)=>{
 
     socket.on("juego:recopilarResultados", (datos)=>{//datos contiene =
         //nombreSala //nombreUsuario //resultadosUsuario  //y agrego puntajes (contiene el punto de cada celda)
+        //aca se agregan ok
         let info={
             nombreSala:datos.nombreSala,
             nombreUsuario:datos.nombreUsuario,
@@ -311,6 +313,7 @@ io.on("connection", (socket)=>{
 
 
     socket.on("juego:robarResultados", (listaVictimas)=>{
+        // console.log("LISTA DE VICTIMAS: "+listaVictimas.length);//llegan ok
         listaVictimas.forEach( (victima)=>{
             io.to(victima.idUsuario).emit("juego:necesitoTusResultados",obtenerNombre(socket.id));
         })
@@ -324,9 +327,11 @@ io.on("connection", (socket)=>{
         
     socket.on("juego:pedirResultadosSala", (nombreSala)=>{
         let resultadosEstaSala= new Array();
+        // let contador=1;
         listaResultadosSalas.forEach((resultadosSala)=>{
             if(resultadosSala.nombreSala==nombreSala){
                 resultadosEstaSala.push(resultadosSala);
+                // console.log("ESTA SALA TIENE USUARIOS:"+contador++);
             }
         })
         io.to(socket.id).emit("juego:recibiendoResultados",resultadosEstaSala);
@@ -343,11 +348,13 @@ io.on("connection", (socket)=>{
     })
     
     socket.on("juego:resetearResultadosSala", (nombreSala)=>{//eliminos los resultados de mi sala
-        listaResultadosSalas.forEach( (resultado,index)=>{//nombreSala //nombreUsuario //resultadosUsuario  
-            if(resultado.nombreSala==nombreSala){
+        for(let index=0;index<listaResultadosSalas.length;index++){//nombreSala //nombreUsuario //resultadosUsuario  
+            // console.log("Nombre sala: "+listaResultadosSalas[index].nombreSala);
+            if(listaResultadosSalas[index].nombreSala==nombreSala){
                 listaResultadosSalas.splice(index,1);
+                index--;
             }
-        })
+        }
     })
 
     socket.on("juego:guardarPuntajesJugada", (listaDatos)=>{//nombreUsuario //puntajeUsuario
